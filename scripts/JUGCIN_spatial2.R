@@ -4,9 +4,7 @@
 # LOAD PACKAGES
 library(vegan)
 library(usdm)
-install.packages('Rcpp')
-library('ggplot2')
-library('shadowtext')
+library(ggplot2)
 library(grid)
 library(maps)
 library(dplyr)
@@ -50,7 +48,7 @@ summary_table <- pops_health7 %>%
   pivot_wider(names_from = NewHyb_FinalAssignment,values_from = n,values_fill = 0)
 summary_table
 summary_table <- pops_health7 %>%
-  count(HASC_2, NewHyb_FinalAssignment) %>%
+  count(HASC_2, NAME_2, NAME_1, NewHyb_FinalAssignment) %>%
   pivot_wider(
     names_from = NewHyb_FinalAssignment,
     values_from = n,
@@ -58,17 +56,62 @@ summary_table <- pops_health7 %>%
   ) %>%
   left_join(
     pops_health7 %>%
-      group_by(HASC_2) %>%
-      summarize(mean_JC_struc = mean(JC_struc, na.rm = TRUE)),
-    by = "HASC_2"
-  )
-summary_table <- summary_table %>% mutate(Hybrids = rowSums(across(-c(HASC_2, JC, JA, mean_JC_struc))))
-summary_table <- summary_table %>% mutate(Total = (rowSums(across(-c(HASC_2, mean_JC_struc, Hybrids)))))
+      group_by(HASC_2, NAME_2, NAME_1) %>%
+      summarize(mean_JC_struc = mean(JC_struc, na.rm = TRUE), .groups="drop"),
+    by = c("HASC_2","NAME_2", 'NAME_1'))
+summary_table <- summary_table %>% mutate(Hybrids = rowSums(across(-c(HASC_2, NAME_2, NAME_1, JC, JA, mean_JC_struc))))
+summary_table <- summary_table %>% mutate(Total = (rowSums(across(-c(HASC_2, NAME_2, NAME_1, mean_JC_struc, Hybrids)))))
 summary_table <- summary_table %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
-
 write.csv(summary_table,"./summaries/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
 
+## plot on map
+library(geodata)
+library(sf)
+can <- gadm("CAN",level = 2,path = "../JUGCIN_git_externalFiles",resolution = 2)
+usa <- gadm("USA",level = 2,path = "../JUGCIN_git_externalFiles",resolution = 2)
+admin1 <- rbind(usa, can)
+admin1_sf<-st_as_sf(admin1)
+sf::sf_use_s2(FALSE)
+admin1_east <- st_crop(admin1_sf,xmin = -100,xmax = -62, ymin = 25,ymax = 51)
+sf::sf_use_s2(TRUE)
+admin1_east <- admin1_east %>%
+  group_by(HASC_2) %>%
+  summarize()
+admin1_east <- admin1_east %>%
+  left_join(summary_table, by = "HASC_2")
+sum(admin1_east$Total, na.rm = TRUE)
+sum(as.numeric(summary_table$Total[!is.na(summary_table$Total)]))
 
+label_pts <- st_point_on_surface(admin1_east)
+label_coords <- cbind(
+  st_drop_geometry(label_pts),
+  st_coordinates(label_pts))
+
+plot<-ggplot(admin1_east) +
+  geom_sf(aes(fill = Hybrid_perc), color = "grey50", linewidth = 0.2) +
+  scale_fill_viridis_c(na.value = "white") +
+  theme_void() +
+  labs(fill = "Percent of\ntotal that are\nhybrids") +
+  geom_sf_text(data = subset(label_pts, !is.na(Total)),aes(label = Total),size = 0.5,color = "black",fontface='bold') +
+  labs(caption = "*Numbers indicate total number of trees sampled per county", size=2) +
+  theme(plot.caption = element_text(hjust = 1,vjust = 1.5),
+        legend.position=c(0.85,0.35))
+plot
+ggsave(filename="./summaries/HybridSummariesByCounty_percentHybrid.png",plot=plot, width=5, height=4, units='in', bg='white',dpi=600)
+
+plot2<-ggplot(admin1_east) +
+  geom_sf(aes(fill = mean_JC_struc), color = "grey50", linewidth = 0.2) +
+  scale_fill_viridis_c(na.value = "white", direction=-1) +
+  theme_void() + 
+  labs(fill="Average\nAncestry\nProportion") +
+  geom_sf_text(data=subset(label_pts, !is.na(Total)), aes(label=Total), size=0.5, color='black', fontface='bold') +
+  labs(caption = "*Numbers indicate total number of trees sampled per county", size=2) +
+  theme(plot.caption = element_text(hjust = 1,vjust = 1.5),
+        legend.position=c(0.85,0.35))
+plot2
+ggsave(filename="./summaries/HybridSummariesByCounty_ancestryProportion.png",plot=plot2, width=5, height=4, units='in', bg='white', dpi=600)
+
+## summarize by state
 summary_table2 <- pops_health7 %>%
   count(NAME_1, NewHyb_FinalAssignment) %>%
   pivot_wider(
@@ -85,39 +128,49 @@ summary_table2 <- pops_health7 %>%
 summary_table2 <- summary_table2 %>% mutate(Hybrids = rowSums(across(-c(NAME_1, JC, JA, mean_JC_struc))))
 summary_table2 <- summary_table2 %>% mutate(Total = (rowSums(across(-c(NAME_1, mean_JC_struc, Hybrids)))))
 summary_table2 <- summary_table2 %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
-
 write.csv(summary_table2,"./summaries/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
 
 ## plot on map
-library(rnaturalearth)
-library(sf)
 us <- ne_states(country = "United States of America", returnclass = "sf")
 ca <- ne_states(country = "Canada", returnclass = "sf")
-
 admin <- bind_rows(us, ca)
 admin <- admin %>%
   left_join(summary_table2, by = c("name" = "NAME_1"))
-
 admin_east <- st_crop(admin, xmin = -100, xmax = -62, ymin = 25, ymax = 51)
-library('shadowtext')
-ggplot(admin_east) +
+library(sf)
+label_pts <- st_point_on_surface(admin_east)
+label_coords <- cbind(
+  st_drop_geometry(label_pts),
+  st_coordinates(label_pts))
+plot3<-ggplot(admin_east) +
   geom_sf(aes(fill = Hybrid_perc), color = "grey50", linewidth = 0.2) +
   scale_fill_viridis_c(na.value = "white") +
-  theme_void() + 
-  labs(fill="Percent of\ntotal that are\nhybrids") +
-  geom_shadowtext(data=subset(admin_east, !is.na(Total)), aes(label=Total), size=2, bg.color='white', bg.r=0.15, color='black') +
-  labs(caption = "*Numbers indicate total number of trees sampled per state")
+  theme_void() +
+  labs(fill = "Percent of\ntotal that are\nhybrids") +
+  geom_sf_text(
+    data = subset(label_pts, !is.na(Total)),
+    aes(label = Total),
+    size = 2,
+    color = "black",
+    fontface='bold') +
+    labs(caption = "*Numbers indicate total number of trees sampled per state")+
+  theme(plot.caption = element_text(hjust = 1,vjust = 1.5),
+        legend.position=c(0.89,0.35))
+plot3
+ggsave(filename="./summaries/HybridSummariesByState_percentHybrid.png",plot=plot3, width=5, height=4, units='in', bg='white' )
 
 colnames(admin_east)
-plot<-ggplot(admin_east) +
+plot4<-ggplot(admin_east) +
   geom_sf(aes(fill = mean_JC_struc), color = "grey50", linewidth = 0.2) +
-  scale_fill_viridis_c(na.value = "white") +
+  scale_fill_viridis_c(na.value = "white", direction=-1) +
   theme_void() + 
   labs(fill="Average\nAncestry\nProportion") +
-  geom_shadowtext(data=subset(admin_east, !is.na(Total)), aes(label=Total), size=2, bg.color='white', bg.r=0.15, color='black') +
+  geom_sf_text(data=subset(admin_east, !is.na(Total)), aes(label=Total), size=2, color='black', fontface='bold') +
   labs(caption = "*Numbers indicate total number of trees sampled per state") +
-  theme(plot.caption = element_text(hjust = 1.3,vjust = 1.5))
-ggsave(filename="./summaries/HybridSummariesByState.png",plot=plot, width=6, height=4, units='in', bg='white' )
+  theme(plot.caption = element_text(hjust = 1,vjust = 1.5),
+        legend.position=c(0.89,0.35))
+plot4
+ggsave(filename="./summaries/HybridSummariesByState_ancestryProportion.png",plot=plot4, width=5, height=4, units='in', bg='white' )
 
 ##################################################################
 
