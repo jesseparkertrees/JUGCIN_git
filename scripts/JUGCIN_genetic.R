@@ -1086,3 +1086,52 @@ summary_df_all2<-left_join(summary_df_all,Q_all,by="LabID")
 summary_df_all2$NewHyb_FinalAssignment<-ifelse(summary_df_all2$confident_called_runs>2,summary_df_all2$majority_class_totalProb, ifelse(summary_df_all2$summed_prob>3,summary_df_all2$majority_class_totalProb, ifelse(summary_df_all2$JC_struc>0.55, "complexBC_JC", ifelse(summary_df_all2$JC_struc<0.45,"complexBC_JA", "complexBCF"))))
 summary(as.factor(summary_df_all2$NewHyb_FinalAssignment))
 write.csv(summary_df_all2, "genetics_summary_37cat.csv")
+
+##################################################################
+# generate expected ancestry proportions from NewHybrids categories
+catgens<-read.csv("./summaries/NewHybrids_categories_generations.csv")
+catgensnots<-catgens$Notation2[1:38]
+ancestry <- function(x) {
+  x <- gsub("\\s+", "", x)
+  # base cases
+  if (x == "JA") return(0)
+  if (x == "JC") return(1)
+  # remove outer parentheses only if they enclose the whole expression
+  if (substr(x,1,1) == "(" && substr(x,nchar(x),nchar(x)) == ")") {
+    depth <- 0
+    enclosed <- TRUE
+    for(i in seq_len(nchar(x))) {
+      char <- substr(x,i,i)
+      if(char=="(") depth <- depth + 1
+      if(char==")") depth <- depth - 1
+      # if depth reaches zero before the end, parentheses are not outer
+      if(depth == 0 && i < nchar(x)) {
+        enclosed <- FALSE
+        break
+      }
+    }
+    if(enclosed) {
+      x <- substr(x,2,nchar(x)-1)
+    }
+  }
+  # find top-level *
+  depth <- 0
+  split_pos <- NULL
+  for(i in seq_len(nchar(x))) {
+    char <- substr(x,i,i)
+    if(char=="(") depth <- depth + 1
+    if(char==")") depth <- depth - 1
+    
+    if(char=="*" && depth == 0) {
+      split_pos <- i
+      break
+    }
+  }
+  if(is.null(split_pos)) {
+    stop(paste("Cannot parse:", x))
+  }
+  left <- substr(x,1,split_pos-1)
+  right <- substr(x,split_pos+1,nchar(x))
+  return((ancestry(left)+ancestry(right))/2)
+}
+ances<-sapply(catgensnots, ancestry)

@@ -4,7 +4,9 @@
 # LOAD PACKAGES
 library(vegan)
 library(usdm)
-library(ggplot2)
+install.packages('Rcpp')
+library('ggplot2')
+library('shadowtext')
 library(grid)
 library(maps)
 library(dplyr)
@@ -24,7 +26,6 @@ pops_health6$X<-NULL
 ##################################################################
 # SUMMARIZE NEWHYBIDS CATEGORIES
 ## filter out trees that there were not NewHybrids assignments for
-dim(pops_health7)
 pops_health7<-pops_health6[pops_health6$NewHyb_FinalAssignment!="",]
 sum(pops_health6$NewHyb_FinalAssignment=="")
 dim(pops_health6)
@@ -41,17 +42,12 @@ histplot<-ggplot(pops_health7, aes(x = NewHyb_FinalAssignment)) +
 histplot
 newhyb_table <- pops_health7 %>%
   count(NewHyb_FinalAssignment)
-write.csv(newhyb_table,"./outputs/summaries/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
+write.csv(newhyb_table,"./summaries/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 
 ## summarize categories by admin unit
 summary_table <- pops_health7 %>%
   count(HASC_2, NewHyb_FinalAssignment) %>%
-  pivot_wider(
-    names_from = NewHyb_FinalAssignment,
-    values_from = n,
-    values_fill = 0
-  )
-
+  pivot_wider(names_from = NewHyb_FinalAssignment,values_from = n,values_fill = 0)
 summary_table
 summary_table <- pops_health7 %>%
   count(HASC_2, NewHyb_FinalAssignment) %>%
@@ -67,8 +63,12 @@ summary_table <- pops_health7 %>%
     by = "HASC_2"
   )
 summary_table <- summary_table %>% mutate(Hybrids = rowSums(across(-c(HASC_2, JC, JA, mean_JC_struc))))
-summary_table <- summary_table %>% mutate(Hybrid_perc = Hybrids/rowSums(across(-c(HASC_2, mean_JC_struc, Hybrids))))
-write.csv(summary_table,"./outputs/summaries/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
+summary_table <- summary_table %>% mutate(Total = (rowSums(across(-c(HASC_2, mean_JC_struc, Hybrids)))))
+summary_table <- summary_table %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
+
+write.csv(summary_table,"./summaries/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
+
+
 summary_table2 <- pops_health7 %>%
   count(NAME_1, NewHyb_FinalAssignment) %>%
   pivot_wider(
@@ -83,95 +83,55 @@ summary_table2 <- pops_health7 %>%
     by = "NAME_1"
   )
 summary_table2 <- summary_table2 %>% mutate(Hybrids = rowSums(across(-c(NAME_1, JC, JA, mean_JC_struc))))
-summary_table2 <- summary_table2 %>% mutate(Hybrid_perc = Hybrids/rowSums(across(-c(NAME_1, mean_JC_struc, Hybrids))))
-summary_table2
-write.csv(summary_table2,"./outputs/summaries/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
+summary_table2 <- summary_table2 %>% mutate(Total = (rowSums(across(-c(NAME_1, mean_JC_struc, Hybrids)))))
+summary_table2 <- summary_table2 %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
+
+write.csv(summary_table2,"./summaries/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
 
 ## plot on map
-usa <- gadm(country = "USA", level = 2, path = "../JUGCIN_git_externalFiles")
-can <- gadm(country = "CAN", level = 2, path = "../JUGCIN_git_externalFiles")
-## combine USA and CAN
-admin <- rbind(usa, can)
-unique(admin$NAME_1)
-unique(summary_table2$NAME_1)
-states_df <- as.data.frame(admin)
-states_df <- states_df %>%
-  left_join(summary_table2, by = "NAME_1")
-states <- merge(admin, states_df[, c("NAME_1", "Hybrids", "Hybrid_perc", "mean_JC_struc")],
-                by = "NAME_1", all.x = TRUE)
-library(terra)
-states_simple <- simplifyGeom(states, tolerance = 0.01)
-plot(states_simple, "Hybrids")
+library(rnaturalearth)
 library(sf)
-library(ggplot2)
-states_sf <- st_as_sf(states_simple)
-ggplot(states_sf) +
-  geom_sf(aes(fill = Hybrid_perc), color = "grey40", linewidth = 0.2) +
-  scale_fill_viridis_c(name = "Hybrid\nproportion", na.value = "white") +
-  theme_void()
-ggplot(states_sf) +
-  geom_sf(aes(fill = Hybrids), color = "grey40", linewidth = 0.2) +
-  scale_fill_viridis_c(name = "Hybrids", na.value = "white") +
-  theme_void()
+us <- ne_states(country = "United States of America", returnclass = "sf")
+ca <- ne_states(country = "Canada", returnclass = "sf")
+
+admin <- bind_rows(us, ca)
+admin <- admin %>%
+  left_join(summary_table2, by = c("name" = "NAME_1"))
+
+admin_east <- st_crop(admin, xmin = -100, xmax = -62, ymin = 25, ymax = 51)
+library('shadowtext')
+ggplot(admin_east) +
+  geom_sf(aes(fill = Hybrid_perc), color = "grey50", linewidth = 0.2) +
+  scale_fill_viridis_c(na.value = "white") +
+  theme_void() + 
+  labs(fill="Percent of\ntotal that are\nhybrids") +
+  geom_shadowtext(data=subset(admin_east, !is.na(Total)), aes(label=Total), size=2, bg.color='white', bg.r=0.15, color='black') +
+  labs(caption = "*Numbers indicate total number of trees sampled per state")
+
+colnames(admin_east)
+plot<-ggplot(admin_east) +
+  geom_sf(aes(fill = mean_JC_struc), color = "grey50", linewidth = 0.2) +
+  scale_fill_viridis_c(na.value = "white") +
+  theme_void() + 
+  labs(fill="Average\nAncestry\nProportion") +
+  geom_shadowtext(data=subset(admin_east, !is.na(Total)), aes(label=Total), size=2, bg.color='white', bg.r=0.15, color='black') +
+  labs(caption = "*Numbers indicate total number of trees sampled per state") +
+  theme(plot.caption = element_text(hjust = 1.3,vjust = 1.5))
+ggsave(filename="./summaries/HybridSummariesByState.png",plot=plot, width=6, height=4, units='in', bg='white' )
 
 ##################################################################
+
 # spatial analysis
-pops_health5<-read.csv("pops_health5_04272026.csv")
-pops_health5$X<-NULL
-library(maps)
-# Extract state (returns "state_name:region")
-states <- map.where(database = "state", pops_health5$x_new, pops_health5$y_new)
-states <- sapply(strsplit(states, ":"), "[", 1)
-print(states) 
-pops_health5$state<-states
-
-pops_health5$HybridYN<-ifelse(pops_health5$NH_final_assignment=="NewHyb_Butternut" | pops_health5$NH_final_assignment=="NewHyb_Heartnut", 0,1 )
-summary(as.factor(pops_health5$NH_final_assignment))
-
-summary(pops_health5$CLUSTER_ID)
-pops_health5$CLUSTER_ID<-as.character(pops_health5$CLUSTER_ID)
-
-sum_clust<-pops_health5 %>%
-  group_by(CLUSTER_ID, NH_final_assignment, state) %>%
-  summarise(count= n(), .groups="drop")
-
-sum_state1 <- pops_health5 %>%
-  group_by(state, NH_final_assignment) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  tidyr::pivot_wider(
-    names_from = NH_final_assignment,
-    values_from = n,
-    values_fill = 0  )
-colnames(sum_state1)
-sum_state1$hyb<-rowSums(sum_state1[,c(3:9,11:14)])
-sum_state1$JC<-rowSums(sum_state1[,2])
-sum_state1$JA<-rowSums(sum_state1[,10])
-sum_state1$tot<-rowSums(sum_state1[,2:14])
+colnames(pops_health7)
+pops_health7$NAME_1
+summary(as.factor(pops_health7$NewHyb_FinalAssignment))
+pops_health7$HybridYN<-ifelse(pops_health7$NewHyb_FinalAssignment=="JC" | pops_health7$NewHyb_FinalAssignment=="JA", 0,1 )
+summary(as.factor(pops_health7$HybridYN))
+summary(as.factor(pops_health7$CLUSTER_ID))
 
 
-sum_clust2 <- sum_clust %>%
-  tidyr::pivot_wider(
-    names_from = NH_final_assignment,
-    values_from = count,
-    values_fill = 0  )
-colnames(sum_clust2)
-sum_clust2$hyb<-rowSums(sum_clust2[,c(2:6,8:9,11:14)])
-sum_clust2$JC<-rowSums(sum_clust2[,7])
-sum_clust2$JA<-rowSums(sum_clust2[,10])
-sum_clust2$tot<-rowSums(sum_clust2[,2:14])
-
-dim(sum_clust2[sum_clust2$CLUSTER_ID!=0 & sum_clust2$hyb>0,])
-(58+45)/353
-
-dim(sum_clust2[sum_clust2$CLUSTER_ID!=0 & sum_clust2$JA>0,])
-7/353
-
-length(sum_clust2$hyb[sum_clust2$hyb==0])
-length(sum_clust2$hyb[sum_clust2$hyb>0])
-length(unique(sum_clust2$CLUSTER_ID))
-58/159
-
-ILM<-pops_health5[pops_health5$CLUSTER_ID=="3",]
+################delete?############################
+#ILM<-pops_health5[pops_health5$CLUSTER_ID=="3",]
 ILM$height_bin <- cut(
   ILM$PlantHeight_ft,
   breaks = c(-Inf, 5, 15, 30, Inf),
@@ -200,19 +160,21 @@ CP$height_bin <- cut(
   labels = c("<5 ft", "5–15 ft", "15–30 ft", ">30 ft"),
   right = FALSE
 )
+################delete?############################
 
-
+##################################################################
 #check correlation
 library(tidyr)
-pops_health5_var<-pops_health5 %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_1,wc2.1_30s_bio_11,wc2.1_30s_bio_12,wc2.1_30s_bio_3) %>% drop_na() %>% as.data.frame()
-cor(pops_health5_var)
+colnames(pops_health7)
+pops_health7_var<-pops_health7 %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_1,wc2.1_30s_bio_11,wc2.1_30s_bio_12,wc2.1_30s_bio_3) %>% drop_na() %>% as.data.frame()
+cor(pops_health7_var)
 library(usdm)
-usdm::vif(pops_health5_var)
-pops_health5_var<-pops_health5 %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_12, wc2.1_30s_bio_15) %>% drop_na() %>% as.data.frame()
-usdm::vif(pops_health5_var)
+usdm::vif(pops_health7_var)
+pops_health7_var<-pops_health7 %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_12, wc2.1_30s_bio_15) %>% drop_na() %>% as.data.frame()
+usdm::vif(pops_health7_var)
 
 #rescale data
-pops_health5 <- pops_health5 |>
+pops_health8 <- pops_health7 |>
   dplyr::mutate(
     PlantHeight_ft = as.numeric(PlantHeight_ft),
     human_footprint_z = scale(wildareas.v3.2009.human.footprint),
@@ -224,6 +186,9 @@ pops_health5 <- pops_health5 |>
     ph_z = scale(phh2o_0.5cm),
     nit_z = scale(nitrogen_0.5cm),
     CLUSTER_ID=as.factor(CLUSTER_ID),
+    NAME_1=as.factor(NAME_1),
+    NAME_2=as.factor(NAME_2),
+    HASC_2=as.factor(HASC_2),
     NLCD_1km=as.factor(NLCD_1km),
     NLCD_5km=as.factor(NLCD_5km),
     NLCD=as.factor(NLCD),
@@ -234,20 +199,40 @@ pops_health5 <- pops_health5 |>
 
 ##################################################################
 # spatial analysis
-colnames(pops_health5)
+colnames(pops_health8)
 
 library("glmmTMB")
 library(performance)
 library("ggeffects")
 
-mod_beta <- glmmTMB(HybridYN ~ ForestEdge_30m_z*TCC_5km_z*bio12_z*nit_z+(1|CLUSTER_ID),family = binomial(),data = pops_health5)
-
-mod_beta <- glmmTMB(HybridYN ~ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health5)
-
-mod_beta <- glmmTMB(HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health5)
-
+mod_beta <- glmmTMB(HybridYN ~ ForestEdge_30m_z*TCC_5km_z*bio12_z*nit_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
 summary(mod_beta)
+
+mod_beta2 <- glmmTMB(HybridYN ~ ForestEdge_NorAmer_custom_z*TCC_5km_z*bio12_z*nit_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta2)
+
+mod_beta3 <- glmmTMB(HybridYN ~ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta3)
+
+mod_beta4 <- glmmTMB(HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta4)
+
+mod_beta5 <- glmmTMB(HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta5)
+
+mod_beta6 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta6)
+
+mod_beta7 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta7)
+
+mod_beta8 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|NAME_1),family = binomial(),data = pops_health8)
+summary(mod_beta8)
+
 r2(mod_beta)
+
+AIC(mod_beta, mod_beta2, mod_beta3, mod_beta4, mod_beta5, mod_beta6, mod_beta7)
+
 plot(ggpredict(mod_beta, terms = "TCC_5km_z"))
 plot(ggpredict(mod_beta, terms = "human_footprint_z"))
 plot(ggpredict(mod_beta, terms = "NLCD_5km"))
