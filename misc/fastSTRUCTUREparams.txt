@@ -1,0 +1,61 @@
+# code for running fastSTRUCTURE in command line
+# go to JUGCIN_git directory
+# create environment and load fastSTRUCTURE
+
+```
+cd ../JUGCIN_git_externalFiles/
+conda activate faststructure_env 
+python <path to conda environment>/faststructure_env/bin/structure.py
+nano iter_struc.sh
+```
+# paste this into bash script
+"
+#!/bin/bash
+for K in {1..15}
+do
+  for REP in {1..10}
+  do
+    echo "Running K=$K, REP=$REP ..."
+    python <path to conda environment>/faststructure_env/bin/structure.py \
+      -K $K \
+      --input=./Butternut_Landscape_vcf2str \
+      --output=./structure_output/AZIZrun_K${K}_rep${REP} \
+      --format=str \
+      --seed=101
+    echo "Finished K=$K, REP=$REP"
+  done
+done
+"
+
+#run script
+```
+bash iter_struc.sh
+```
+
+##############################################################################
+# code for running fastSTRUCTURE in command line for the "pure" individuals
+# paste the following into .sh file (substitute path to .py folder with local path and go to directory with structure formatted file)
+```
+nano iter_pure.sh
+"
+#!/bin/bash
+for K in {1..15}
+do
+  for REP in {1..10}
+  do
+    echo "Running K=$K, REP=$REP ..."
+    python <path to conda environment>/faststructure_env/bin/structure.py \
+      -K $K \
+      --input=./pure_2524inds_faststr \
+      --output=./structure_outputs/pure/run1_K${K}_rep${REP} \
+      --format=str \
+      --seed=$RANDOM
+    echo "Finished K=$K, REP=$REP"
+  done
+done
+"
+
+#run script
+```
+bash iter_pure.sh
+```

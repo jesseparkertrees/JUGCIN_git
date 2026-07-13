@@ -1,0 +1,25 @@
+STRUCTURE on microsatellite data
+
+Parameters:
+K values: 1-12
+Repetitions per K: 3 
+Length of Burnin Period: 50000
+Number of MCMC Reps after Burnin: 100000
+
+Ancestry Model Info:
+Use Admixture Model       
+* Infer Alpha
+* Initial Value of ALPHA (Dirichlet Parameter for Degree of Admixture):  1.0
+* Use Same Alpha for all Populations
+* Use a Uniform Prior for Alpha
+** Maximum Value for Alpha: 10.0
+** SD of Proposal for Updating Alpha: 0.025
+
+Frequency Model Info:
+Allele Frequencies are Correlated among Pops
+* Assume Different Values of Fst for Different Subpopulations
+* Prior Mean of Fst for Pops: 0.01
+* Prior SD   of Fst for Pops: 0.05
+* Use Constant Lambda (Allele Frequencies Parameter) 
+* Value of Lambda: 1.0
+

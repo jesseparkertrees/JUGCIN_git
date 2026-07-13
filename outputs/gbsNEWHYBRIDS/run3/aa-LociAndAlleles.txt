@@ -1,0 +1,1201 @@
+300 polymorphic loci from 300 loci in data set
+
+Locus 1
+	1
+	2
+
+Locus 2
+	1
+	2
+
+Locus 3
+	1
+	2
+
+Locus 4
+	1
+	2
+
+Locus 5
+	1
+	2
+
+Locus 6
+	1
+	2
+
+Locus 7
+	1
+	2
+
+Locus 8
+	1
+	2
+
+Locus 9
+	1
+	2
+
+Locus 10
+	1
+	2
+
+Locus 11
+	1
+	2
+
+Locus 12
+	1
+	2
+
+Locus 13
+	1
+	2
+
+Locus 14
+	1
+	2
+
+Locus 15
+	1
+	2
+
+Locus 16
+	1
+	2
+
+Locus 17
+	1
+	2
+
+Locus 18
+	1
+	2
+
+Locus 19
+	1
+	2
+
+Locus 20
+	1
+	2
+
+Locus 21
+	1
+	2
+
+Locus 22
+	1
+	2
+
+Locus 23
+	1
+	2
+
+Locus 24
+	1
+	2
+
+Locus 25
+	1
+	2
+
+Locus 26
+	1
+	2
+
+Locus 27
+	1
+	2
+
+Locus 28
+	1
+	2
+
+Locus 29
+	1
+	2
+
+Locus 30
+	1
+	2
+
+Locus 31
+	1
+	2
+
+Locus 32
+	1
+	2
+
+Locus 33
+	1
+	2
+
+Locus 34
+	1
+	2
+
+Locus 35
+	1
+	2
+
+Locus 36
+	1
+	2
+
+Locus 37
+	1
+	2
+
+Locus 38
+	1
+	2
+
+Locus 39
+	1
+	2
+
+Locus 40
+	1
+	2
+
+Locus 41
+	1
+	2
+
+Locus 42
+	1
+	2
+
+Locus 43
+	1
+	2
+
+Locus 44
+	1
+	2
+
+Locus 45
+	1
+	2
+
+Locus 46
+	1
+	2
+
+Locus 47
+	1
+	2
+
+Locus 48
+	1
+	2
+
+Locus 49
+	1
+	2
+
+Locus 50
+	1
+	2
+
+Locus 51
+	1
+	2
+
+Locus 52
+	1
+	2
+
+Locus 53
+	1
+	2
+
+Locus 54
+	1
+	2
+
+Locus 55
+	1
+	2
+
+Locus 56
+	1
+	2
+
+Locus 57
+	1
+	2
+
+Locus 58
+	1
+	2
+
+Locus 59
+	1
+	2
+
+Locus 60
+	1
+	2
+
+Locus 61
+	1
+	2
+
+Locus 62
+	1
+	2
+
+Locus 63
+	1
+	2
+
+Locus 64
+	1
+	2
+
+Locus 65
+	1
+	2
+
+Locus 66
+	1
+	2
+
+Locus 67
+	1
+	2
+
+Locus 68
+	1
+	2
+
+Locus 69
+	1
+	2
+
+Locus 70
+	1
+	2
+
+Locus 71
+	2
+	1
+
+Locus 72
+	1
+	2
+
+Locus 73
+	1
+	2
+
+Locus 74
+	1
+	2
+
+Locus 75
+	1
+	2
+
+Locus 76
+	1
+	2
+
+Locus 77
+	1
+	2
+
+Locus 78
+	1
+	2
+
+Locus 79
+	1
+	2
+
+Locus 80
+	1
+	2
+
+Locus 81
+	1
+	2
+
+Locus 82
+	1
+	2
+
+Locus 83
+	1
+	2
+
+Locus 84
+	1
+	2
+
+Locus 85
+	1
+	2
+
+Locus 86
+	1
+	2
+
+Locus 87
+	1
+	2
+
+Locus 88
+	1
+	2
+
+Locus 89
+	1
+	2
+
+Locus 90
+	1
+	2
+
+Locus 91
+	1
+	2
+
+Locus 92
+	1
+	2
+
+Locus 93
+	1
+	2
+
+Locus 94
+	1
+	2
+
+Locus 95
+	1
+	2
+
+Locus 96
+	1
+	2
+
+Locus 97
+	1
+	2
+
+Locus 98
+	1
+	2
+
+Locus 99
+	1
+	2
+
+Locus 100
+	1
+	2
+
+Locus 101
+	1
+	2
+
+Locus 102
+	2
+	1
+
+Locus 103
+	1
+	2
+
+Locus 104
+	1
+	2
+
+Locus 105
+	1
+	2
+
+Locus 106
+	1
+	2
+
+Locus 107
+	1
+	2
+
+Locus 108
+	1
+	2
+
+Locus 109
+	1
+	2
+
+Locus 110
+	1
+	2
+
+Locus 111
+	1
+	2
+
+Locus 112
+	1
+	2
+
+Locus 113
+	1
+	2
+
+Locus 114
+	1
+	2
+
+Locus 115
+	1
+	2
+
+Locus 116
+	1
+	2
+
+Locus 117
+	1
+	2
+
+Locus 118
+	1
+	2
+
+Locus 119
+	1
+	2
+
+Locus 120
+	1
+	2
+
+Locus 121
+	1
+	2
+
+Locus 122
+	1
+	2
+
+Locus 123
+	1
+	2
+
+Locus 124
+	2
+	1
+
+Locus 125
+	1
+	2
+
+Locus 126
+	1
+	2
+
+Locus 127
+	1
+	2
+
+Locus 128
+	1
+	2
+
+Locus 129
+	1
+	2
+
+Locus 130
+	1
+	2
+
+Locus 131
+	1
+	2
+
+Locus 132
+	1
+	2
+
+Locus 133
+	1
+	2
+
+Locus 134
+	1
+	2
+
+Locus 135
+	1
+	2
+
+Locus 136
+	1
+	2
+
+Locus 137
+	1
+	2
+
+Locus 138
+	1
+	2
+
+Locus 139
+	1
+	2
+
+Locus 140
+	1
+	2
+
+Locus 141
+	1
+	2
+
+Locus 142
+	1
+	2
+
+Locus 143
+	1
+	2
+
+Locus 144
+	1
+	2
+
+Locus 145
+	1
+	2
+
+Locus 146
+	1
+	2
+
+Locus 147
+	1
+	2
+
+Locus 148
+	1
+	2
+
+Locus 149
+	1
+	2
+
+Locus 150
+	1
+	2
+
+Locus 151
+	1
+	2
+
+Locus 152
+	2
+	1
+
+Locus 153
+	1
+	2
+
+Locus 154
+	1
+	2
+
+Locus 155
+	1
+	2
+
+Locus 156
+	1
+	2
+
+Locus 157
+	1
+	2
+
+Locus 158
+	1
+	2
+
+Locus 159
+	2
+	1
+
+Locus 160
+	1
+	2
+
+Locus 161
+	1
+	2
+
+Locus 162
+	1
+	2
+
+Locus 163
+	1
+	2
+
+Locus 164
+	1
+	2
+
+Locus 165
+	1
+	2
+
+Locus 166
+	1
+	2
+
+Locus 167
+	1
+	2
+
+Locus 168
+	1
+	2
+
+Locus 169
+	1
+	2
+
+Locus 170
+	1
+	2
+
+Locus 171
+	1
+	2
+
+Locus 172
+	1
+	2
+
+Locus 173
+	1
+	2
+
+Locus 174
+	1
+	2
+
+Locus 175
+	1
+	2
+
+Locus 176
+	1
+	2
+
+Locus 177
+	2
+	1
+
+Locus 178
+	2
+	1
+
+Locus 179
+	1
+	2
+
+Locus 180
+	1
+	2
+
+Locus 181
+	1
+	2
+
+Locus 182
+	1
+	2
+
+Locus 183
+	1
+	2
+
+Locus 184
+	1
+	2
+
+Locus 185
+	1
+	2
+
+Locus 186
+	1
+	2
+
+Locus 187
+	1
+	2
+
+Locus 188
+	1
+	2
+
+Locus 189
+	1
+	2
+
+Locus 190
+	1
+	2
+
+Locus 191
+	1
+	2
+
+Locus 192
+	1
+	2
+
+Locus 193
+	1
+	2
+
+Locus 194
+	1
+	2
+
+Locus 195
+	1
+	2
+
+Locus 196
+	1
+	2
+
+Locus 197
+	1
+	2
+
+Locus 198
+	1
+	2
+
+Locus 199
+	1
+	2
+
+Locus 200
+	1
+	2
+
+Locus 201
+	1
+	2
+
+Locus 202
+	1
+	2
+
+Locus 203
+	1
+	2
+
+Locus 204
+	1
+	2
+
+Locus 205
+	1
+	2
+
+Locus 206
+	1
+	2
+
+Locus 207
+	1
+	2
+
+Locus 208
+	1
+	2
+
+Locus 209
+	2
+	1
+
+Locus 210
+	2
+	1
+
+Locus 211
+	1
+	2
+
+Locus 212
+	1
+	2
+
+Locus 213
+	1
+	2
+
+Locus 214
+	1
+	2
+
+Locus 215
+	1
+	2
+
+Locus 216
+	1
+	2
+
+Locus 217
+	1
+	2
+
+Locus 218
+	1
+	2
+
+Locus 219
+	1
+	2
+
+Locus 220
+	1
+	2
+
+Locus 221
+	1
+	2
+
+Locus 222
+	1
+	2
+
+Locus 223
+	1
+	2
+
+Locus 224
+	1
+	2
+
+Locus 225
+	1
+	2
+
+Locus 226
+	1
+	2
+
+Locus 227
+	1
+	2
+
+Locus 228
+	1
+	2
+
+Locus 229
+	1
+	2
+
+Locus 230
+	1
+	2
+
+Locus 231
+	1
+	2
+
+Locus 232
+	1
+	2
+
+Locus 233
+	1
+	2
+
+Locus 234
+	1
+	2
+
+Locus 235
+	1
+	2
+
+Locus 236
+	1
+	2
+
+Locus 237
+	1
+	2
+
+Locus 238
+	1
+	2
+
+Locus 239
+	1
+	2
+
+Locus 240
+	1
+	2
+
+Locus 241
+	1
+	2
+
+Locus 242
+	1
+	2
+
+Locus 243
+	1
+	2
+
+Locus 244
+	1
+	2
+
+Locus 245
+	1
+	2
+
+Locus 246
+	1
+	2
+
+Locus 247
+	2
+	1
+
+Locus 248
+	1
+	2
+
+Locus 249
+	1
+	2
+
+Locus 250
+	1
+	2
+
+Locus 251
+	1
+	2
+
+Locus 252
+	1
+	2
+
+Locus 253
+	1
+	2
+
+Locus 254
+	1
+	2
+
+Locus 255
+	1
+	2
+
+Locus 256
+	1
+	2
+
+Locus 257
+	1
+	2
+
+Locus 258
+	1
+	2
+
+Locus 259
+	1
+	2
+
+Locus 260
+	1
+	2
+
+Locus 261
+	1
+	2
+
+Locus 262
+	1
+	2
+
+Locus 263
+	1
+	2
+
+Locus 264
+	1
+	2
+
+Locus 265
+	1
+	2
+
+Locus 266
+	1
+	2
+
+Locus 267
+	1
+	2
+
+Locus 268
+	1
+	2
+
+Locus 269
+	1
+	2
+
+Locus 270
+	1
+	2
+
+Locus 271
+	1
+	2
+
+Locus 272
+	1
+	2
+
+Locus 273
+	1
+	2
+
+Locus 274
+	2
+	1
+
+Locus 275
+	2
+	1
+
+Locus 276
+	1
+	2
+
+Locus 277
+	1
+	2
+
+Locus 278
+	1
+	2
+
+Locus 279
+	1
+	2
+
+Locus 280
+	1
+	2
+
+Locus 281
+	1
+	2
+
+Locus 282
+	1
+	2
+
+Locus 283
+	1
+	2
+
+Locus 284
+	1
+	2
+
+Locus 285
+	1
+	2
+
+Locus 286
+	1
+	2
+
+Locus 287
+	1
+	2
+
+Locus 288
+	1
+	2
+
+Locus 289
+	1
+	2
+
+Locus 290
+	1
+	2
+
+Locus 291
+	1
+	2
+
+Locus 292
+	1
+	2
+
+Locus 293
+	1
+	2
+
+Locus 294
+	1
+	2
+
+Locus 295
+	1
+	2
+
+Locus 296
+	1
+	2
+
+Locus 297
+	1
+	2
+
+Locus 298
+	1
+	2
+
+Locus 299
+	1
+	2
+
+Locus 300
+	1
+	2

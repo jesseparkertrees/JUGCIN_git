@@ -1,0 +1,26 @@
+CODE TO RUN NEWHYBRIDS IN COMMAND LINE FOR HOBAN MICROSATELLITE DATA
+1. first convert .str file used for STRUCTURE to NEWHYBRIDS file using PGDspider
+2. then run JUGCIN_processMsatData.R through line 109
+3. run the code below
+## assumes starting directory is JUGCIN_git/ and the NewHybrids executable is in ../newhybrids/
+## assumes input file is ./data/msats_newhybs.txt
+
+```
+#run with default (6) hybrid categories
+cd ./outputs/msatNEWHYBRIDS/
+../../../newhybrids/newhybrids-no-gui-linux.exe -d ../../data/newhybrids_input_withZ.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 35 51
+
+#run with 31 hybrid categories 
+mkdir 31cats
+cd 31cats/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../../data/newhybrids_input_withZ.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 35 51 --gtyp-cat-file ../../../data/genotype_cats_31.txt
+```
+
+Individuals assigned to a category if the posterior probability of assignment exceed 0.75
+For the run using 6 classes (JC, JA, F1, F2, BCJC, BCJA), 68 individuals failed to be assigned (no single catergory exceeded 0.75). These were subsequently assigned as: 
+1. "complexBCJA" if the STRUCTURE Q value was less than 0.4.
+2. "complexF" if the STRUCTURE Q value fell between 0.4 and 0.6.
+3. "complexBCJA" if the structure Q value was greater than 0.6.
+
+This resulted in 9 total hybrid classes. 
+

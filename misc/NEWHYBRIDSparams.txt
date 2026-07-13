@@ -1,0 +1,55 @@
+# CODE TO RUN NEWHYBRIDS IN COMMAND LINE
+## assumes starting directory is JUGCIN_git/ and the NewHybrids executable is in ../newhybrids/
+## assumes input files are in ../outputs/gbsNEWHYBRIDS/inputs
+
+```
+cd ./outputs/gbsNEWHYBRIDS/
+mkdir run1/
+cd run1/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_1.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 33 99 --gtyp-cat-file ../../../data/genotype_cats_31.txt
+cd ..
+
+mkdir run2/
+cd run2/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_2.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 33 99 --gtyp-cat-file ../../../data/genotype_cats_31.txt
+cd ..
+
+mkdir run3/
+cd run3/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_3.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 33 99 --gtyp-cat-file ../../../data/genotype_cats_31.txt
+cd ..
+
+mkdir run4/
+cd run4/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_4.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 33 99 --gtyp-cat-file ../../../data/genotype_cats_31.txt
+cd ..
+```
+
+# RUN WITH 37 CATEGORIES
+```
+cd ./outputs/gbsNEWHYBRIDS/
+
+mkdir 37cats_run1/
+cd 37cats_run1/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_1.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 33 99 --gtyp-cat-file ../../../data/genotype_cats_37.txt
+cd ..
+
+mkdir 37cats_run2/
+cd 37cats_run2/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_2.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 43 55 --gtyp-cat-file ../../../data/genotype_cats_37.txt
+cd ..
+
+mkdir 37cats_run3/
+cd 37cats_run3/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_3.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 12 65 --gtyp-cat-file ../../../data/genotype_cats_37.txt
+cd ..
+
+mkdir 37cats_run4/
+cd 37cats_run4/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_4.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 42 89 --gtyp-cat-file ../../../data/genotype_cats_37.txt
+cd ..
+
+mkdir 37cats_run5/
+cd 37cats_run5/
+../../../../newhybrids/newhybrids-no-gui-linux.exe -d ../inputs/set_5.txt --no-gui --burn-in 50000 --num-sweeps 50000 --seeds 42 89 --gtyp-cat-file ../../../data/genotype_cats_37.txt
+cd ..
