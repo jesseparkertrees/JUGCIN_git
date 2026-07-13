@@ -1,42 +1,43 @@
-Hybrid_Category,Number_Hybrid_Generations,Notation,Notation2
-JA,0,JA,JA
-JC,0,JC,JC
-F1,1,JAxJC,JA*JC
-F2,2,(JAxJC)x(JAxJC),(JA*JC)*(JA*JC)
-BCJA,2,(JAxJC)xJA,(JA*JC)*JA
-BCJC,2,(JAxJC)xJC,(JA*JC)*JC
-BCJAxBCJA,3,((JAxJC)xJA)x((JAxJC)xJA),((JA*JC)*JA)*((JA*JC)*JA)
-BCJCxBCJC,3,((JAxJC)xJC)x((JAxJC)xJC),((JA*JC)*JC)*((JA*JC)*JC)
-BCJCxBCJA,3,((JAxJC)xJC)x((JAxJC)xJA),((JA*JC)*JC)*((JA*JC)*JA)
-BC2JC,3,((JAxJC)xJC)xJC,((JA*JC)*JC)*JC
-BC2JA,3,((JAxJC)xJA)xJA,((JA*JC)*JA)*JA
-BC3JC,4,(((JAxJC)xJC)xJC)xJC,(((JA*JC)*JC)*JC)*JC
-BC3JA,4,(((JAxJC)xJA)xJA)xJA,(((JA*JC)*JA)*JA)*JA
-BC2JCxBC2JC,4,(((JAxJC)xJC)xJC)x(((JAxJC)xJC)xJC),(((JA*JC)*JC)*JC)*(((JA*JC)*JC)*JC)
-BC2JAxBC2JA,4,(((JAxJC)xJA)xJA)x(((JAxJC)xJA)xJA),(((JA*JC)*JA)*JA)*(((JA*JC)*JA)*JA)
-BCJCxBC2JC,4,((JAxJC)xJC)x(((JAxJC)xJC)xJC),((JA*JC)*JC)*(((JA*JC)*JC)*JC)
-BCJAxBC2JA,4,((JAxJC)xJA)x(((JAxJC)xJA)xJA),((JA*JC)*JA)*(((JA*JC)*JA)*JA)
-BcJCxBc2JA,4,((JAxJC)xJC)x(((JAxJC)xJA)xJA) OR ((JAxJC)xJA)x(((JAxJC)xJC)xJC),((JA*JC)*JC)*(((JA*JC)*JA)*JA)
-BcJAxBc2JC,4,((JAxJC)xJC)x(((JAxJC)xJA)xJA) OR ((JAxJC)xJA)x(((JAxJC)xJC)xJC),((JA*JC)*JA)*(((JA*JC)*JC)*JC)
-BCJAxBC3JA,5,((JAxJC)xJA)x((((JAxJC)xJA)xJA)xJA),((JA*JC)*JA)*((((JA*JC)*JA)*JA)*JA)
-BC2JAxBC3JA,5,(((JAxJC)xJA)xJA)x((((JAxJC)xJA)xJA)xJA),(((JA*JC)*JA)*JA)*((((JA*JC)*JA)*JA)*JA)
-BCJCxBC3JC,5,((JAxJC)xJC)x((((JAxJC)xJC)xJC)xJC),((JA*JC)*JC)*((((JA*JC)*JC)*JC)*JC)
-BC2JCxBC3JC,5,(((JAxJC)xJC)xJC)x((((JAxJC)xJC)xJC)xJC),(((JA*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC)
-BC2JAxBC3JC,5,(((JAxJC)xJA)xJA)x((((JAxJC)xJC)xJC)xJC),(((JA*JC)*JA)*JA)*((((JA*JC)*JC)*JC)*JC)
-BC3JAxBC2JC,5,((((JAxJC)xJA)xJA)xJA)x(((JAxJC)xJC)xJC),((((JA*JC)*JA)*JA)*JA)*(((JA*JC)*JC)*JC)
-BC4JC,5,((((JAxJC)xJC)xJC)xJC)xJC,((((JA*JC)*JC)*JC)*JC)*JC
-BC4JA,5,((((JAxJC)xJA)xJA)xJA)xJA,((((JA*JC)*JA)*JA)*JA)*JA
-BC5JC,6,(((((JAxJC)xJC)xJC)xJC)xJC)xJC,(((((JA*JC)*JC)*JC)*JC)*JC)*JC
-BC5JA,6,(((((JAxJC)xJA)xJA)xJA)xJA)xJA,(((((JA*JC)*JA)*JA)*JA)*JA)*JA
-BC6JC,7,((((((JAxJC)xJC)xJC)xJC)xJC)xJC)xJC,((((((JA*JC)*JC)*JC)*JC)*JC)*JC)*JC
-BC6JA,7,((((((JAxJC)xJA)xJA)xJA)xJA)xJA)xJA,((((((JA*JC)*JA)*JA)*JA)*JA)*JA)*JA
-BC3JCxBC3JC,5,((((JAxJC)xJC)xJC)xJC)x((((JAxJC)xJC)xJC)xJC),((((JA*JC)*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC)
-BC3JAxBC3JA,5,((((JAxJC)xJA)xJA)xJA)x((((JAxJC)xJA)xJA)xJA),((((JA*JC)*JA)*JA)*JA)*((((JA*JC)*JA)*JA)*JA)
-F1xF2,3,(JAxJC)x((JAxJC)x(JAxJC)),(JA*JC)*((JA*JC)*(JA*JC))
-F2xBCJC,3,((JAxJC)xJC)x((JAxJC)x(JAxJC)),((JA*JC)*JC)*((JA*JC)*(JA*JC))
-F2xBCJA,3,((JAxJC)xJA)x((JAxJC)x(JAxJC)),((JA*JC)*JA)*((JA*JC)*(JA*JC))
-F1xBCJC,3,((JAxJC)xJC)x(JAxJC),((JA*JC)*JC)*(JA*JC)
-F1xBCJA,3,((JAxJC)xJA)x(JAxJC),((JA*JC)*JA)*(JA*JC)
-complexBCF,4+,multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion remains between 0.4 and 0.6),
-complexBCJA,4+,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion less than 0.4, majority JA ancestry)",
-complexBCJC,4+,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion greater than 0.6, majority JC ancestry)",
+Hybrid_Category,Number_Hybrid_Generations,Notation,Expected Ancestry Proportion
+JC,0,JC,1
+BC6JC,7,((((((JA*JC)*JC)*JC)*JC)*JC)*JC)*JC,0.9921875
+BC5JC,6,(((((JA*JC)*JC)*JC)*JC)*JC)*JC,0.984375
+BC4JC,5,((((JA*JC)*JC)*JC)*JC)*JC,0.96875
+BC3JC,4,(((JA*JC)*JC)*JC)*JC,0.9375
+BC3JCxBC3JC,5,((((JA*JC)*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC),0.9375
+BC2JCxBC3JC,5,(((JA*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC),0.90625
+BC2JC,3,((JA*JC)*JC)*JC,0.875
+BC2JCxBC2JC,4,(((JA*JC)*JC)*JC)*(((JA*JC)*JC)*JC),0.875
+BCJCxBC3JC,5,((JA*JC)*JC)*((((JA*JC)*JC)*JC)*JC),0.84375
+BCJCxBC2JC,4,((JA*JC)*JC)*(((JA*JC)*JC)*JC),0.8125
+BCJC,2,(JA*JC)*JC,0.75
+BCJCxBCJC,3,((JA*JC)*JC)*((JA*JC)*JC),0.75
+F2xBCJC,3,((JA*JC)*JC)*((JA*JC)*(JA*JC)),0.625
+F1xBCJC,3,((JA*JC)*JC)*(JA*JC),0.625
+BcJAxBc2JC*,4,((JA*JC)*JA)*(((JA*JC)*JC)*JC),0.5625
+BC2JAxBC3JC,5,(((JA*JC)*JA)*JA)*((((JA*JC)*JC)*JC)*JC),0.53125
+F1,1,JA*JC,0.5
+F2,2,(JA*JC)*(JA*JC),0.5
+BCJCxBCJA,3,((JA*JC)*JC)*((JA*JC)*JA),0.5
+F1xF2,3,(JA*JC)*((JA*JC)*(JA*JC)),0.5
+BC3JAxBC2JC,5,((((JA*JC)*JA)*JA)*JA)*(((JA*JC)*JC)*JC),0.46875
+BcJCxBc2JA*,4,((JA*JC)*JC)*(((JA*JC)*JA)*JA),0.4375
+F2xBCJA,3,((JA*JC)*JA)*((JA*JC)*(JA*JC)),0.375
+F1xBCJA,3,((JA*JC)*JA)*(JA*JC),0.375
+BCJA,2,(JA*JC)*JA,0.25
+BCJAxBCJA,3,((JA*JC)*JA)*((JA*JC)*JA),0.25
+BCJAxBC2JA,4,((JA*JC)*JA)*(((JA*JC)*JA)*JA),0.1875
+BCJAxBC3JA,5,((JA*JC)*JA)*((((JA*JC)*JA)*JA)*JA),0.15625
+BC2JA,3,((JA*JC)*JA)*JA,0.125
+BC2JAxBC2JA,4,(((JA*JC)*JA)*JA)*(((JA*JC)*JA)*JA),0.125
+BC2JAxBC3JA,5,(((JA*JC)*JA)*JA)*((((JA*JC)*JA)*JA)*JA),0.09375
+BC3JA,4,(((JA*JC)*JA)*JA)*JA,0.0625
+BC3JAxBC3JA,5,((((JA*JC)*JA)*JA)*JA)*((((JA*JC)*JA)*JA)*JA),0.0625
+BC4JA,5,((((JA*JC)*JA)*JA)*JA)*JA,0.03125
+BC5JA,6,(((((JA*JC)*JA)*JA)*JA)*JA)*JA,0.015625
+BC6JA,7,((((((JA*JC)*JA)*JA)*JA)*JA)*JA)*JA,0.0078125
+JA,0,JA,0
+complexBCJC,4+,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion greater than 0.6, majority JC ancestry)",>0.5
+complexBCJA,4+,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion less than 0.4, majority JA ancestry)",<0.5
+complexBCF,4+,multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion remains between 0.4 and 0.6),~0.5
+*NewHybrids cannot distinguish these categories,,,
