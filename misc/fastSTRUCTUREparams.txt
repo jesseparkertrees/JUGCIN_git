@@ -1,9 +1,12 @@
+##############################################################################
+##### Part 1. ######
 # code for running fastSTRUCTURE in command line
 # go to JUGCIN_git directory
-# create environment and load fastSTRUCTURE
+# create environment and load fastSTRUCTURE via bioconda
 
 ```
 cd ../JUGCIN_git_externalFiles/
+mkdir structure_output/
 conda activate faststructure_env 
 python <path to conda environment>/faststructure_env/bin/structure.py
 nano iter_struc.sh
@@ -33,8 +36,9 @@ bash iter_struc.sh
 ```
 
 ##############################################################################
+##### Part 2. ######
 # code for running fastSTRUCTURE in command line for the "pure" individuals
-# paste the following into .sh file (substitute path to .py folder with local path and go to directory with structure formatted file)
+# paste the following into .sh file (substitute path to .py folder with local path and go to directory with structure formatted file: ../JUGCIN_git_externalFiles/)
 ```
 nano iter_pure.sh
 "
@@ -47,7 +51,7 @@ do
     python <path to conda environment>/faststructure_env/bin/structure.py \
       -K $K \
       --input=./pure_2524inds_faststr \
-      --output=./structure_outputs/pure/run1_K${K}_rep${REP} \
+      --output=./structure_output/pure/run1_K${K}_rep${REP} \
       --format=str \
       --seed=$RANDOM
     echo "Finished K=$K, REP=$REP"

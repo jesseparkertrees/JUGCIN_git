@@ -1,6 +1,6 @@
 CODE TO RUN NEWHYBRIDS IN COMMAND LINE FOR HOBAN MICROSATELLITE DATA
 1. first convert .str file used for STRUCTURE to NEWHYBRIDS file using PGDspider
-2. then run JUGCIN_processMsatData.R through line 109
+2. then run JUGCIN_processMsatData.R through line 113
 3. run the code below
 ## assumes starting directory is JUGCIN_git/ and the NewHybrids executable is in ../newhybrids/
 ## assumes input file is ./data/msats_newhybs.txt

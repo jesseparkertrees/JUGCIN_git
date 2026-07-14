@@ -1,5 +1,22 @@
-STRUCTURE on microsatellite data
+# RUNNING STRUCTURE ON HOBAN MICROSATELLITE DATA  
 
+Open STRUCTURE 4.3.2 GUI
+Start a new project
+Load the structure formatted genotype table located at: "./data/project_data.str"
+
+Enter the following when prompted:
+	Number of individuals: 1743
+	Ploidy of data: 2 ploidy
+	Number of loci: 12
+	Missing data value: -9
+
+	Check box for Individual ID for each individual
+
+Select Parameter Set > New ...
+Enter based on the information below.
+Run STRUCTURE
+
+----------------------
 Parameters:
 K values: 1-12
 Repetitions per K: 3 

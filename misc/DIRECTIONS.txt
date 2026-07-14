@@ -1,9 +1,22 @@
 DIRECTIONS
 
+All file paths refer to the root directory for this Git page ("JUGCIN_git/" = "./").
 
+You can put this directory wherever you like. To save space on the github, some large files like environmental datasets will be downloaded into a folder in the parent directory ("../"), so keep that in mind. 
+
+To fully reproduce this code, some additional programs will be used:
+	1. Rstudio vers. 4.4.2
+	2. STRUCTURE vers. 2.3.4; 
+	3. fastSTRUCTURE: installed via bioconda 
+	4. NewHybrids vers. 1.1 beta: 
+
+The only additional file that is needed to reproduce this is the VCF file titled "../JUGCIN_git_externalFiles/Butternut_Landscape_nJNn9.clean.sub3382.vcf.gz"
+
+To begin, open the R Project located at "./JUGCIN_git.Rproj".
+Under "./scripts/"
 RUN 
-1.
-2.
-3.
-4.
-5.
+1. "./scripts/JUGCIN_genetic.R" #generate and analyze files for genetic analyses (you will run fastSTRUCTURE and NewHybrids separately within this)
+2. "./scripts/JUGCIN_processMsatData.R" #generate and analyze files for genetic analyses of Hoban Microsatellite data (you will run STRUCTURE and NewHybrids separately within this)
+3. "./scripts/JUGCIN_prepareData.R" #filter coordinates, combine msats and gbs genetics data, download and extract environmental variables, export for downstream analyses
+4. "./scripts/JUGCIN_spatial2.R" #generate summary tables and figures of hybridization, modeling hybridization with landscape and environmental factors, etc. 
+5. "./scripts/JUGCIN_health.R"

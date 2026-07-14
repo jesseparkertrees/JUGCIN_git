@@ -50,6 +50,7 @@ msat_ids_master<-rename(msat_ids_master,"ID"="id_num")
 msat_all<-left_join(msat_ids_geno2, msat_ids_master, by="ID")
 length(unique(msat_all$ID))
 
+# load microsatellite genotype table "Nuclear_Data_F_5_1_10good.csv" format by 
 
 # GET RESULTS FROM STRUCTURE RUN (performed in GUI and merged with metadata) 
 k3qfull<-read.csv("./outputs/structure/msats/50100k_run_7_f_Qsummary_fulldata.csv")

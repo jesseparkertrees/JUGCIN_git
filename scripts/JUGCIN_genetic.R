@@ -1,4 +1,16 @@
 ####################################################
+########  SET UP DIRECTORIES  ######################
+####################################################
+getwd() #should be "JUGCIN_git/"
+dir_path <- "../JUGCIN_git_externalFiles/"
+# if it doesn't exist, create it
+if (!dir.exists(dir_path)) {
+  dir.create(dir_path)
+}
+# this is where you will put the file "Butternut_Landscape_nJNn9.clean.sub3382.vcf.gz" (acquired separately)
+# you will also download environmental datasets into this folder later
+
+####################################################
 ########  BUTTERNUT GENETIC ANALYSIS  ##############
 ####################################################
 library(vcfR)
@@ -17,16 +29,17 @@ g<-gl.compliance.check(g)
 g@ind.names
 
 ## export .str file for running fastStructure in the command line
-#gl2faststructure(g, outfile = "../JUGCIN_git_externalFiles/Butternut_Landscape_vcf2str.str", outpath=getwd())
+gl2faststructure(g, outfile = "../JUGCIN_git_externalFiles/Butternut_Landscape_vcf2str.str", outpath=getwd())
+# go to command line and run fastSTRUCTURE. See Part 1 of: "./misc/fastSTRUCTUREparams.txt" for instructions/code for running fastSTRUCTURE
 
 ######################################################################
-########  import fastStructure results and select best K  ############
+########  IMPORT FASTSTRUCTURE RESULTS AND SELECT BEST K  ############
 ######################################################################
 library(dplyr)
 library(stringr)
 library(ggplot2)
 # folder containing logs
-log_dir <- "../JUGCIN_git_externalFiles/structure_output/"   # change to whatever directory contains STRUCTURE files
+log_dir <- "../JUGCIN_git_externalFiles/structure_output/"  
 files <- list.files(log_dir, pattern="AZIZrun.*\\.log$", full.names=TRUE)
 # extract K and marginal likelihood
 dat <- lapply(files, function(f){
@@ -86,8 +99,10 @@ length(pure_ind)
 g_filt_maf <- gl.filter.maf(g, threshold = 0.05)
 g_pure<-gl.keep.ind(g_filt_maf, ind.list = pure_ind)
 g_pure<-gl.compliance.check(g_pure)
-#gl2faststructure(g_pure, outfile = "../JUGCIN_git_externalFiles/pure_2524inds_faststr.str", outpath=getwd())
-## run fastSTRUCTURE in the command line (see ./misc/fastSTRUCTUREparams.txt)
+
+# EXPORT fastSTRUCTURE file
+gl2faststructure(g_pure, outfile = "../JUGCIN_git_externalFiles/pure_2524inds_faststr.str", outpath=getwd())
+## run fastSTRUCTURE in the command line (see part 2 of "./misc/fastSTRUCTUREparams.txt")
 
 #######################################################################
 ######   analyze results of fastStructure for pure individuals ########
@@ -686,8 +701,11 @@ summary_df_all2$NewHyb_FinalAssignment<-ifelse(summary_df_all2$confident_called_
                                                    
 write.csv(summary_df_all2, "genetics_summary.csv")
 
+
 ############################################################
-# summarize newhybrids results for 37 categories
+############################################################
+#archive?
+#summarize newhybrids results for 37 categories
 ids <- indNames(g_fixed_bal)
 par_pops<-pop(g_fixed_bal)
 list.files("./outputs/gbsNEWHYBRIDS/")
