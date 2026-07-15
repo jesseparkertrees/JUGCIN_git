@@ -21,6 +21,21 @@ pops_health6[pops_health6$NAME_2=='',]
 pops_health6[pops_health6$HASC_2=='',]
 colnames(pops_health6)
 pops_health6$X<-NULL
+
+## edit PlantHeight_ft numbers from Hoban microsatellite data that aren't exact numbers
+pops_health6 <- pops_health6 %>%
+  mutate(
+    PlantHeight_ft = case_when(
+      grepl("^\\d+-\\d+$", PlantHeight_ft) ~
+        as.character(sapply(strsplit(PlantHeight_ft, "-"),
+                            function(x) mean(as.numeric(x)))),
+      grepl("^\\d+\\s*\\+$", PlantHeight_ft) ~
+        sub("\\s*\\+$", "", PlantHeight_ft),
+      TRUE ~ PlantHeight_ft
+    ),
+    PlantHeight_ft = as.numeric(PlantHeight_ft)
+  )
+
 ##################################################################
 # SUMMARIZE NEWHYBIDS CATEGORIES
 ## filter out trees that there were not NewHybrids assignments for/ make new final assigment with 31 cats
@@ -33,10 +48,21 @@ pops_health6$NewHyb_msats[pops_health6$NewHyb_msats == "NA"] <- NA
 pops_health6$NewHyb_FinalAssignment<-coalesce(pops_health6$NewHyb_msats, pops_health6$NewHyb_31cats)
 summary(as.factor(pops_health6$NewHyb_FinalAssignment))
 
+
+#CHOOSE TO ANALYZE ALL SAMPLES TOGETHER (MSATS and GBS, 2) or just GBS (1) 
+#1
+#pops_health7<-pops_health6[pops_health6$NewHyb_31cats!="",]
+#dim(pops_health7)
+#summary(as.factor(pops_health7$NewHyb_31cats))
+#pops_health7$NewHyb_FinalAssignment<-NULL
+#pops_health7<-rename(pops_health7, 'NewHyb_FinalAssignment'='NewHyb_31cats')
+
+#2
 pops_health7<-pops_health6[pops_health6$NewHyb_FinalAssignment!="",]
 sum(pops_health6$NewHyb_FinalAssignment=="")
 dim(pops_health6)
 dim(pops_health7)
+
 ## summarize categories
 nh_gens<-read.csv("./summaries/NewHybrids_categories_generations_31.csv")
 order<-nh_gens$Hybrid_Category
@@ -44,7 +70,7 @@ nh_gens$Hybrid_Category <- factor(nh_gens$Hybrid_Category,levels = order)
 pops_health7$NewHyb_FinalAssignmentFACTOR<-factor(pops_health7$NewHyb_FinalAssignment, levels=order)
 newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=FALSE)
 write.csv(newhyb_table,"./summaries/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
-
+#write.csv(newhyb_table,"./summaries/summaries_justGBS/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 p_hist <- pops_health7 %>%
   filter(!NewHyb_FinalAssignment %in% c("JC", "JA")) %>%
   ggplot(aes(x = JC_struc)) +
@@ -60,7 +86,9 @@ p_hist <- pops_health7 %>%
     caption = "Excludes individuals assigned to the pure JC and JA classes."
   )
 p_hist
+#ggsave(filename="./summaries/summaries_justGBS/AncestryProportionHistogramNOHYBRIDS.png",plot=p_hist, width=5, height=5, units='in', bg='white' )
 ggsave(filename="./summaries/AncestryProportionHistogramNOHYBRIDS.png",plot=p_hist, width=5, height=5, units='in', bg='white' )
+
 
 newhyb_table<-rename(newhyb_table, Hybrid_Category=NewHyb_FinalAssignmentFACTOR)
 
@@ -72,12 +100,26 @@ p<-ggplot(nh_gens, aes(x = Hybrid_Category, y = n)) +
   geom_col() +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.caption=element_text(size=5)) +
-  labs(x = "Hybrid Category",y = "Count") +
+        plot.caption=element_text(size=5),
+        axis.title.x = element_text(size=10)) +
+  labs(x = "Hybrid Category (arranged in order of expected JC ancestry proportion)",y = "Count") +
   geom_text(aes(label = Expected.Ancestry.Proportion), size = 1,color = "hotpink",fontface='bold', vjust=-0.5) +
   labs(caption = "Labels indicate expected JC ancestry proportion\n*these categories are composed of lumped genotypes that failed to converge on a single category")
 p
+#ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogramALL.png",plot=p, width=5, height=5, units='in', bg='white' )
 ggsave(filename="./summaries/HybridSummariesHistogramALL.png",plot=p, width=5, height=5, units='in', bg='white' )
+pmod<-ggplot(nh_gens, aes(x = Hybrid_Category, y = n)) +
+  geom_col() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.caption=element_text(size=5),
+        axis.title.x = element_text(size=10)) +
+  labs(x = "Hybrid Category (arranged in order of expected JC ancestry proportion)",y = "Count") +
+  geom_text(aes(label = paste0(round((n/sum(n))*100,1), "%")), size = 1,color = "hotpink",fontface='bold', vjust=-0.5) +
+  labs(caption = "Labels indicate percentage of total in each hybrid category\n*these categories are composed of lumped genotypes that failed to converge on a single category")
+pmod
+#ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogramALLperclabel.png",plot=pmod, width=5, height=5, units='in', bg='white' )
+ggsave(filename="./summaries/HybridSummariesHistogramALLperclabel.png",plot=pmod, width=5, height=5, units='in', bg='white' )
 
 ### how many of total trees sampled are some sort of hybrid?
 sum(newhyb_table$n[newhyb_table$Hybrid_Category!='JA' & newhyb_table$Hybrid_Category!='JC'])/sum(newhyb_table$n)
@@ -97,6 +139,7 @@ p2<-ggplot(hybrs, aes(x = Hybrid_Category, y = n)) +
   geom_text(aes(label = Expected.Ancestry.Proportion), size = 1,color = "hotpink",fontface='bold', vjust=-0.5) +
   labs(caption = "Labels indicate expected JC ancestry proportion\n*these categories are composed of lumped genotypes that failed to converge on a single category")
 p2
+#ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogram.png",plot=p2, width=5, height=5, units='in', bg='white' )
 ggsave(filename="./summaries/HybridSummariesHistogram.png",plot=p2, width=5, height=5, units='in', bg='white' )
 
 hybrs <- hybrs %>% arrange(Minimum_Number_Hybrid_Generations) %>% mutate(Hybrid_Category = factor(Hybrid_Category,levels = Hybrid_Category))
@@ -110,7 +153,25 @@ p3<-ggplot(hybrs, aes(x = Hybrid_Category, y = n)) +
   geom_text(aes(label = Expected.Ancestry.Proportion), size = 1,color = "hotpink",fontface='bold', vjust=-0.5) +
   labs(caption = "Labels indicate expected JC ancestry proportion\n*these categories are composed of lumped genotypes that failed to converge on a single category")
 p3
+#ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogramArrByGens.png",plot=p3, width=5, height=5, units='in', bg='white' )
 ggsave(filename="./summaries/HybridSummariesHistogramArrByGens.png",plot=p3, width=5, height=5, units='in', bg='white' )
+
+library(ggrepel)
+p4<-ggplot(hybrs, aes(x=Minimum_Number_Hybrid_Generations,y=n))+
+  geom_point() +
+  theme_bw() +
+  labs(x="Number of hybrid generations required", y="Count")+
+  geom_text_repel(aes(label=Hybrid_Category), max.overlaps=Inf, size=1, segment.colour = 'grey',segment.size = 0.4, min.segment.length = 0)
+p4
+ggsave(filename="./summaries/HybridSummariesHistogramArrByGens2.png",plot=p4, width=5, height=5, units='in', bg='white' )
+#ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogramArrByGens2.png",plot=p4, width=5, height=5, units='in', bg='white' )
+p5<-ggplot(hybrs, aes(x=AmongHybridMatings,y=n))+
+  geom_point() +
+  theme_bw() +
+  labs(x="Among Hybrid Matings?", y="Count")+
+  geom_text_repel(aes(label=Hybrid_Category), max.overlaps=Inf, size=1, segment.colour = 'grey',segment.size = 0.4, min.segment.length = 0)
+p5
+#ggsave(filename="./summaries/summaries_justGBS/amongHybridMatings.png",plot=p5, width=5, height=5, units='in', bg='white' )
 
 
 ## summarize categories by "cluster"
@@ -168,7 +229,8 @@ summary_table <- summary_table %>% mutate(Total = (rowSums(across(-c(HASC_2, NAM
 summary_table <- summary_table %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
 #what percent of counties have more than 0 hybrids?
 sum(summary_table$Hybrid_perc>0)/length(summary_table$HASC_2)
-write.csv(summary_table,"./summaries/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
+write.csv(summary_table,"./summaries/summaries_justGBS/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
+#write.csv(summary_table,"./summaries/NewHybridsCategoriesSummaryTableCounties.csv", row.names = FALSE)
 ggplot(data=summary_table, aes(x=Total, y=mean_JC_struc))+
   geom_point() +
   theme_bw() + 
@@ -208,7 +270,8 @@ plot<-ggplot(admin1_east) +
   theme(plot.caption = element_text(hjust = 1,vjust = 1.5, size=2),
         legend.position=c(0.85,0.35))
 plot
-ggsave(filename="./summaries/HybridSummariesByCounty_percentHybrid.png",plot=plot, width=5, height=4, units='in', bg='white',dpi=600)
+ggsave(filename="./summaries/summaries_justGBS/HybridSummariesByCounty_percentHybrid.png",plot=plot, width=5, height=4, units='in', bg='white',dpi=600)
+#ggsave(filename="./summaries/HybridSummariesByCounty_percentHybrid.png",plot=plot, width=5, height=4, units='in', bg='white',dpi=600)
 plot2<-ggplot(admin1_east) +
   geom_sf(aes(fill = mean_JC_struc), color = "grey50", linewidth = 0.2) +
   scale_fill_viridis_c(na.value = "white", direction=-1) +
@@ -219,7 +282,9 @@ plot2<-ggplot(admin1_east) +
   theme(plot.caption = element_text(hjust = 1,vjust = 1.5, size=2),
         legend.position=c(0.85,0.35))
 plot2
-ggsave(filename="./summaries/HybridSummariesByCounty_ancestryProportion.png",plot=plot2, width=5, height=4, units='in', bg='white', dpi=600)
+ggsave(filename="./summaries/summaries_justGBS/HybridSummariesByCounty_ancestryProportion.png",plot=plot2, width=5, height=4, units='in', bg='white', dpi=600)
+
+#ggsave(filename="./summaries/HybridSummariesByCounty_ancestryProportion.png",plot=plot2, width=5, height=4, units='in', bg='white', dpi=600)
 
 ## summarize by state
 summary_table2 <- pops_health7 %>%
@@ -237,7 +302,9 @@ summary_table2 <- pops_health7 %>%
 summary_table2 <- summary_table2 %>% mutate(Hybrids = rowSums(across(-c(NAME_1, JC, JA, mean_JC_struc))))
 summary_table2 <- summary_table2 %>% mutate(Total = (rowSums(across(-c(NAME_1, mean_JC_struc, Hybrids)))))
 summary_table2 <- summary_table2 %>% mutate(Hybrid_perc = (Hybrids/Total)*100)
-write.csv(summary_table2,"./summaries/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
+write.csv(summary_table2,"./summaries/summaries_justGBS/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
+
+#write.csv(summary_table2,"./summaries/NewHybridsCategoriesSummaryTableStates.csv", row.names = FALSE)
 #what percent of states have more than 0 hybrids?
 sum(summary_table2$Hybrid_perc>0)/length(summary_table2$NAME_1)
 ## plot on map
@@ -277,9 +344,9 @@ plot4<-ggplot(admin_east) +
 plot4
 ggsave(filename="./summaries/HybridSummariesByState_ancestryProportion.png",plot=plot4, width=5, height=4, units='in', bg='white' )
 
-##################################################################
-##################################################################
-# SPATIAL MODELING
+
+## HOW DO HYBRID CLASSES CHANGE ACROSS TREE SIZE (using plant height and DBH when available)?
+pops_health7
 colnames(pops_health7)
 pops_health7$NAME_1
 summary(as.factor(pops_health7$NewHyb_FinalAssignment))
@@ -287,6 +354,231 @@ summary(as.factor(pops_health7$NewHyb_FinalAssignment))
 pops_health7$HybridYN<-ifelse(pops_health7$NewHyb_FinalAssignment=="JC" | pops_health7$NewHyb_FinalAssignment=="JA", 0,1 )
 summary(as.factor(pops_health7$HybridYN))
 summary(as.factor(pops_health7$CLUSTER_ID))
+
+pops_health7group<-pops_health7 %>%
+  mutate(
+    Hybrid_Grouping = case_when(
+      NewHyb_FinalAssignment == "JC" ~ "JC",
+      NewHyb_FinalAssignment == "JA" ~ "JA",
+      NewHyb_FinalAssignment == "F1" ~ "F1",
+      NewHyb_FinalAssignment == "F2" ~ "F2",
+      NewHyb_FinalAssignment == "BCJC" ~ "BCJC",
+      NewHyb_FinalAssignment == "BCJA" ~ "BCJA",
+      NewHyb_FinalAssignment %in% c("BC2JC","BC3JC","BC4JC","BC5JC","BC6JC") ~ "Advanced JC backcross",
+      NewHyb_FinalAssignment %in% c("BCJCxBC2JC","BC2JCxBC3JC","BCJCxBC3JC","BCJCxBCJC","complexBCJC") ~ "Advanced complex hybrid JC",
+      NewHyb_FinalAssignment %in% c("complexBCF","BCJCxBCJA","BC2JAxBC3JC") ~ "Advanced complex hybrid F" ,
+      NewHyb_FinalAssignment %in% c("BC2JA","BC3JA","BC4JA","BC5JA","BC6JA") ~ "Advanced JA backcross",
+      NewHyb_FinalAssignment %in% c("complexBCJA","BCJAxBCJA") ~ "Advanced complex hybrid JA"
+    )
+  )
+
+summary(as.factor(pops_health7group$Hybrid_Grouping))
+
+pops_health7group %>%
+  ggplot(aes(x = PlantHeight_ft, color = Hybrid_Grouping)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    aes(x = PlantHeight_ft, color = "All individuals"),
+    linewidth = 1,
+    linetype = "dashed",
+    color='black'
+  ) +
+  theme_bw() +
+  labs(
+    x = "Plant height (ft)",
+    y = "Density",
+    color = "Hybrid class"
+  )
+
+regroup<-pops_health7 %>%
+  filter(NewHyb_FinalAssignment!='JA') %>%
+  mutate(
+    Hybrid_Grouping3 = case_when(
+      NewHyb_FinalAssignment == "JC" ~ "JC",
+      NewHyb_FinalAssignment == "F1" ~ "F1",
+      NewHyb_FinalAssignment %in% c("BC2JC","BC3JC","BC4JC","BC5JC","BC6JC","BCJC") ~ "Mating with JC",
+      NewHyb_FinalAssignment %in% c("complexBCF","BCJCxBCJA","BC2JAxBC3JC","BCJCxBC2JC","BC2JCxBC3JC","BCJCxBC3JC","BCJCxBCJC","complexBCJC","complexBCJA","BCJAxBCJA","F2") ~ "Mating among hybrids" ,
+      NewHyb_FinalAssignment %in% c("BCJA","BC2JA","BC3JA","BC4JA","BC5JA") ~ "Mating with JA"))
+summary(as.factor(regroup$Hybrid_Grouping3))
+hybrid_countsregroup <- regroup %>%
+  filter(!is.na(PlantHeight_ft)) %>%
+  count(Hybrid_Grouping3) %>%
+  mutate(
+    Hybrid_Grouping3_label = paste0(Hybrid_Grouping3, " (n=", n, ")")
+  )
+plotdataregroup <- regroup %>%
+  left_join(hybrid_countsregroup, by = "Hybrid_Grouping3")
+plottimeregroup <- ggplot(plotdataregroup, aes(x = PlantHeight_ft, color = Hybrid_Grouping3_label)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    data = plotdataregroup,
+    aes(x = PlantHeight_ft, color = "Average of all trees with height data ()"),
+    linewidth = 1,
+    linetype = "dashed"
+  ) +
+  theme_bw() +
+  labs(
+    x = "Plant height (ft)",
+    y = "Density",
+    color = "Hybrid class"
+  )
+
+plottimeregroup
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hybridsonly<-pops_health7[pops_health7$HybridYN==1,]
+dim(hybridsonly)
+
+hybridsonlygroup<-hybridsonly %>%
+  mutate(
+    Hybrid_Grouping3 = case_when(
+      NewHyb_FinalAssignment == "F1" ~ "F1",
+      NewHyb_FinalAssignment %in% c("BC2JC","BC3JC","BC4JC","BC5JC","BC6JC","BCJC") ~ "Mating with JC",
+      NewHyb_FinalAssignment %in% c("complexBCF","BCJCxBCJA","BC2JAxBC3JC","BCJCxBC2JC","BC2JCxBC3JC","BCJCxBC3JC","BCJCxBCJC","complexBCJC","complexBCJA","BCJAxBCJA","F2") ~ "Mating among hybrids" ,
+      NewHyb_FinalAssignment %in% c("BCJA","BC2JA","BC3JA","BC4JA","BC5JA") ~ "Mating with JA"))
+summary(as.factor(hybridsonlygroup$Hybrid_Grouping3))
+
+
+hybrid_counts <- hybridsonlygroup %>%
+  filter(!is.na(PlantHeight_ft)) %>%
+  count(Hybrid_Grouping3) %>%
+  mutate(
+    Hybrid_Grouping3_label = paste0(Hybrid_Grouping3, " (n=", n, ")")
+  )
+
+plotdata <- hybridsonlygroup %>%
+  left_join(hybrid_counts, by = "Hybrid_Grouping3")
+
+plottime <- ggplot(plotdata, aes(x = PlantHeight_ft, color = Hybrid_Grouping3_label)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    data = hybridsonlygroup,
+    aes(x = PlantHeight_ft, color = "All hybrids (157 hybrids with height data)"),
+    linewidth = 1,
+    linetype = "dashed"
+  ) +
+  theme_bw() +
+  labs(
+    x = "Plant height (ft)",
+    y = "Density",
+    color = "Hybrid class"
+  )
+
+plottime
+ggsave("./summaries/PlantHeightThroughTime_hybridMatings.png", plottime, width=8, height=4, units='in', bg='white' )
+
+hybrid_counts2 <- hybridsonlygroup %>%
+  filter(!is.na(DBH_cm)) %>%
+  count(Hybrid_Grouping3) %>%
+  mutate(
+    Hybrid_Grouping3_label = paste0(Hybrid_Grouping3, " (n=", n, ")")
+  )
+
+plotdata2 <- hybridsonlygroup %>%
+  left_join(hybrid_counts2, by = "Hybrid_Grouping3")
+plotdata2<-plotdata2[plotdata2$Hybrid_Grouping3!='Mating with JA',]
+plottime2 <- ggplot(plotdata2, aes(x = DBH_cm, color = Hybrid_Grouping3_label)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    data = hybridsonlygroup,
+    aes(x = PlantHeight_ft, color = "All hybrids (157 hybrids with height data)"),
+    linewidth = 1,
+    linetype = "dashed"
+  ) +
+  theme_bw() +
+  labs(
+    x = "Plant height (ft)",
+    y = "Density",
+    color = "Hybrid class"
+  )
+
+plottime2
+ggsave("./summaries/PlantHeightThroughTime_hybridMatings.png", plottime2, width=8, height=4, units='in', bg='white' )
+
+
+
+hybridsonlygroup2<-hybridsonly %>%
+  mutate(
+    Hybrid_Grouping3 = case_when(
+      JC_struc < 0.4 ~ "JA majority (<0.4 JC ances.",
+      JC_struc < 0.6 ~ "approx. equal (0.4-0.6 JC ances.)",
+      JC_struc > 0.6 ~ "JC majority (>0.6 JC ances.)"
+      ))
+hybrid_counts2 <- hybridsonlygroup2 %>%
+  filter(!is.na(PlantHeight_ft)) %>%
+  count(Hybrid_Grouping3) %>%
+  mutate(
+    Hybrid_Grouping3_label = paste0(Hybrid_Grouping3, " (n=", n, ")")
+  )
+
+plotdata3 <- hybridsonlygroup2 %>%
+  left_join(hybrid_counts2, by = "Hybrid_Grouping3")
+
+plottime3 <- ggplot(plotdata3, aes(x = PlantHeight_ft, color = Hybrid_Grouping3_label)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    data = hybridsonlygroup2,
+    aes(x = PlantHeight_ft, color = "All hybrids (157 hybrids with height data)"),
+    linewidth = 1,
+    linetype = "dashed"
+  ) +
+  theme_bw() +
+  labs(
+    x = "Plant height (ft)",
+    y = "Normalized Density",
+    color = "Hybrid class"
+  )
+
+plottime3
+ggsave("./summaries/PlantHeightThroughTime_structureDensity.png", plottime3, width=8, height=4, units='in', bg='white' )
+
+
+
+hybrid_counts3 <- hybridsonlygroup2 %>%
+  filter(!is.na(DBH_cm)) %>%
+  count(Hybrid_Grouping3) %>%
+  mutate(
+    Hybrid_Grouping3_label = paste0(Hybrid_Grouping3, " (n=", n, ")")
+  )
+
+plotdata4 <- hybridsonlygroup2 %>%
+  left_join(hybrid_counts3, by = "Hybrid_Grouping3")
+
+plottime4 <- ggplot(plotdata4, aes(x = DBH_cm, color = Hybrid_Grouping3_label)) +
+  geom_density(linewidth = 1) +
+  geom_density(
+    data = hybridsonlygroup2,
+    aes(x = DBH_cm, color = "All hybrids (157 hybrids with height data)"),
+    linewidth = 1,
+    linetype = "dashed"
+  ) +
+  theme_bw() +
+  labs(
+    x = "DBH (cm)",
+    y = "Normalized Density",
+    color = "Hybrid class"
+  )
+
+plottime4
+
+##################################################################
+##################################################################
+# SPATIAL MODELING
+
 
 #check correlation and select relevant variables
 library(tidyr)
@@ -326,7 +618,6 @@ pops_health8<-pops_health7sc[pops_health7sc$NewHyb_FinalAssignment!="JA",]
 dim(pops_health7sc)
 dim(pops_health8)
 
-
 # SPATIAL MODELING WITH BINARY HYBRID RESPONSE
 colnames(pops_health8)
 library("glmmTMB")
@@ -356,21 +647,65 @@ summary(mod_beta7)
 mod_beta8 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|NAME_1),family = binomial(),data = pops_health8)
 summary(mod_beta8)
 
+mod_beta9 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta9)
+
+mod_beta10 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+ph_z+TCC_5km_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta10)
+
+mod_beta11 <- glmmTMB(HybridYN ~  bio6_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta6)
+
+mod_beta12 <- glmmTMB(HybridYN ~  bio15_z*ForestEdge_NorAmer_custom_z*nit_z*TCC_5km_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta12) #no 'significant' interactions
+
+mod_beta13 <- glmmTMB(HybridYN ~  ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta13)
+
+mod_beta14 <- glmmTMB(HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+TCC_5km_z+NLCD+(1|CLUSTER_ID),family = binomial(),data = pops_health8)
+summary(mod_beta14)
+
+r2(mod_beta6)
 r2(mod_beta7)
 r2(mod_beta8)
+r2(mod_beta9)
+r2(mod_beta10)
+r2(mod_beta11)
+r2(mod_beta12)
+r2(mod_beta13)
+r2(mod_beta14)
 
-AIC(mod_beta, mod_beta2, mod_beta3, mod_beta4, mod_beta5, mod_beta6, mod_beta7, mod_beta8)
+AIC(mod_beta, mod_beta2, mod_beta3, mod_beta4, mod_beta5, mod_beta6, mod_beta7, mod_beta8, mod_beta9, mod_beta10, mod_beta11, mod_beta12, mod_beta13, mod_beta14)
 
-plot(ggpredict(mod_beta, terms = "TCC_5km_z"))
-plot(ggpredict(mod_beta, terms = "human_footprint_z"))
-plot(ggpredict(mod_beta, terms = "NLCD_5km"))
-plot(ggpredict(mod_beta, terms = c("ForestEdge_30m_z","bio6_z")))
-plot(ggpredict(mod_beta, terms = "bio12_z"))
-plot(ggpredict(mod_beta, terms = "bio15_z"))
+summary(mod_beta6)
+plot(ggpredict(mod_beta6, terms = "TCC_5km_z"))
+plot(ggpredict(mod_beta6, terms = c("ForestEdge_NorAmer_custom_z","bio15_z")))
+plot(ggpredict(mod_beta6, terms = "bio15_z"))
+plot(ggpredict(mod_beta6, terms = "TCC_5km_z"))
+plot(ggpredict(mod_beta6, terms = "nit_z"))
+
+pred1 <- ggpredict(mod_beta6, terms = "TCC_5km_z") %>%
+  mutate(variable = "TCC")
+pred2 <- ggpredict(mod_beta6, terms = "bio15_z") %>%
+  mutate(variable = "BIO15")
+pred3 <- ggpredict(mod_beta6, terms = "nit_z") %>%
+  mutate(variable = "Nitrogen")
+pred4 <- ggpredict(mod_beta6, terms = "ForestEdge_NorAmer_custom_z") %>%
+  mutate(variable = "Distance to Forest Edge")
+preds <- bind_rows(pred1, pred2, pred3, pred4)
+preds <- preds |> 
+  dplyr::filter(!is.na(variable))
+ggplot(preds, aes(x, predicted)) +
+  geom_line() +
+  facet_wrap(~variable, scales = "free_x") +
+  theme_bw()
+
 
 par(mar=c(8,8,8,8))
-boxplot(pops_health5$human_footprint_z~pops_health5$NH_final_assignment, las=2)
-boxplot(pops_health5$TCC_1km~pops_health5$NH_final_assignment, las=2)
+boxplot(pops_health8$human_footprint_z~pops_health8$NewHyb_FinalAssignment, las=2)
+boxplot(pops_health8$human_footprint_z~pops_health8$HybridYN, las=2)
+boxplot(pops_health8$TCC_5km~pops_health8$HybridYN, las=2)
+boxplot(pops_health8$TCC_1km~pops_health8$NewHyb_FinalAssignment, las=2)
 
 library("DHARMa")
 sim <- simulateResiduals(mod_beta)
