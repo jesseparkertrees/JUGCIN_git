@@ -3,13 +3,15 @@ This is the readme for the "JUGCIN_git" repo.
 Investigating range-wide patterns of hybridization in Juglans cinerea.
 
 Included are files for data processing, analysis, and visualization.
-Data includes range wide butternut genomic data (GBS), butternut health data from select populations, and geospatial datasets.
+Data includes range wide butternut genomic data (GBS and microsatellites), butternut health data from select populations, and geospatial datasets.
 
-For final summary tables, visit "./summaries/".
+To view summary tables and figures, visit "./summaries/".
+
 To reproduce analyses, visit "./misc/DIRECTIONS.txt" for instructions on how to proceed.
 
 
-SUMMARY OF DIRECTORIES AND FILES:
+
+SUMMARY OF DIRECTORIES AND FILES (not currently up to date 7/16):
 
 "./archive/"	#includes archived files that are not currently relevant
 
@@ -88,3 +90,4 @@ SUMMARY OF DIRECTORIES AND FILES:
 		#summary of NewHybrids category counts by county
 	4. "NewHybridsCategoriesSummaryTableStates.csv"
 		#summary of NewHybrids category counts by state
+	5. ... other table and figures

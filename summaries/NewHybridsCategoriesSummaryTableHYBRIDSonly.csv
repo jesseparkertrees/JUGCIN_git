@@ -1,0 +1,33 @@
+"Hybrid_Category","Minimum_Number_Hybrid_Generations","Notation","Expected.Ancestry.Proportion","AmongHybridMatings","n","n_perc"
+"BC6JC",7,"((((((JA*JC)*JC)*JC)*JC)*JC)*JC)*JC","0.992","No",9,1.6728624535316
+"BC5JC",6,"(((((JA*JC)*JC)*JC)*JC)*JC)*JC","0.984","No",0,0
+"BC4JC",5,"((((JA*JC)*JC)*JC)*JC)*JC","0.969","No",5,0.929368029739777
+"BC3JC",4,"(((JA*JC)*JC)*JC)*JC","0.938","No",0,0
+"BC3JCxBC3JC",5,"((((JA*JC)*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC)","0.938","Yes",0,0
+"BC2JCxBC3JC",5,"(((JA*JC)*JC)*JC)*((((JA*JC)*JC)*JC)*JC)","0.906","Yes",6,1.11524163568773
+"BC2JC",3,"((JA*JC)*JC)*JC","0.875","No",10,1.85873605947955
+"BC2JCxBC2JC",4,"(((JA*JC)*JC)*JC)*(((JA*JC)*JC)*JC)","0.875","Yes",0,0
+"BCJCxBC3JC",5,"((JA*JC)*JC)*((((JA*JC)*JC)*JC)*JC)","0.844","Yes",12,2.23048327137546
+"BCJCxBC2JC",4,"((JA*JC)*JC)*(((JA*JC)*JC)*JC)","0.812","Yes",2,0.371747211895911
+"BCJC",2,"(JA*JC)*JC","0.75","No",115,21.3754646840149
+"BCJCxBCJC",3,"((JA*JC)*JC)*((JA*JC)*JC)","0.75","Yes",21,3.90334572490706
+"BC2JAxBC3JC",5,"(((JA*JC)*JA)*JA)*((((JA*JC)*JC)*JC)*JC)","0.531","Yes",16,2.97397769516729
+"F1",1,"JA*JC","0.5","No",76,14.1263940520446
+"F2",2,"(JA*JC)*(JA*JC)","0.5","Yes",69,12.8252788104089
+"BCJCxBCJA",3,"((JA*JC)*JC)*((JA*JC)*JA)","0.5","Yes",19,3.53159851301115
+"BC3JAxBC2JC",5,"((((JA*JC)*JA)*JA)*JA)*(((JA*JC)*JC)*JC)","0.469","Yes",0,0
+"BCJA",2,"(JA*JC)*JA","0.25","No",23,4.27509293680297
+"BCJAxBCJA",3,"((JA*JC)*JA)*((JA*JC)*JA)","0.25","Yes",6,1.11524163568773
+"BCJAxBC2JA",4,"((JA*JC)*JA)*(((JA*JC)*JA)*JA)","0.188","Yes",0,0
+"BCJAxBC3JA",5,"((JA*JC)*JA)*((((JA*JC)*JA)*JA)*JA)","0.156","Yes",0,0
+"BC2JA",3,"((JA*JC)*JA)*JA","0.125","No",0,0
+"BC2JAxBC2JA",4,"(((JA*JC)*JA)*JA)*(((JA*JC)*JA)*JA)","0.125","Yes",0,0
+"BC2JAxBC3JA",5,"(((JA*JC)*JA)*JA)*((((JA*JC)*JA)*JA)*JA)","0.094","Yes",0,0
+"BC3JA",4,"(((JA*JC)*JA)*JA)*JA","0.062","No",0,0
+"BC3JAxBC3JA",5,"((((JA*JC)*JA)*JA)*JA)*((((JA*JC)*JA)*JA)*JA)","0.062","Yes",0,0
+"BC4JA",5,"((((JA*JC)*JA)*JA)*JA)*JA","0.031","No",0,0
+"BC5JA",6,"(((((JA*JC)*JA)*JA)*JA)*JA)*JA","0.016","No",0,0
+"BC6JA",7,"((((((JA*JC)*JA)*JA)*JA)*JA)*JA)*JA","0.008","No",0,0
+"complexBCJC",3,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion greater than 0.6, majority JC ancestry)",">0.5*","Yes",108,20.0743494423792
+"complexBCJA",3,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion less than 0.4, majority JA ancestry)","<0.5*","Yes",16,2.97397769516729
+"complexBCF",3,"multiple combinations of JA/JC/Fgen and backcross matings (ancestry proportion remains between 0.4 and 0.6)","~0.5*","Yes",25,4.64684014869888

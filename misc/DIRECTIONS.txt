@@ -2,15 +2,18 @@ DIRECTIONS
 
 All file paths refer to the root directory for this Git page ("JUGCIN_git/" = "./").
 
-You can put this directory wherever you like. To save space on the github, some large files like environmental datasets will be downloaded into a folder in the parent directory ("../"), so keep that in mind. 
+You can put this directory wherever you like. To save space on the GitHub, some large files like environmental datasets will be downloaded into a folder in the parent directory ("../"), so keep that in mind. 
 
-To fully reproduce this code, some additional programs will be used:
+TO only reproduce spatial analyses and summaries, open "./scripts/JUGCIN_spatial2.R" and run it.
+
+To fully reproduce this code (including generating and analyzing files with genetic software and downloading environmental datasets), some additional programs will be used:
 	1. Rstudio vers. 4.4.2
 	2. STRUCTURE vers. 2.3.4; 
 	3. fastSTRUCTURE: installed via bioconda 
-	4. NewHybrids vers. 1.1 beta: 
+	4. NewHybrids vers. 1.1 beta: downloaded from <https://ib.berkeley.edu/labs/slatkin/eriq/software/software.htm>
+Some environmental datasets will also need to be downloaded from various sources and put in the parent directory ("../JUGCIN_git_externalFiles/"). Links for these are provided in "./scripts/prepareData.R"
 
-The only additional file that is needed to reproduce this is the VCF file titled "../JUGCIN_git_externalFiles/Butternut_Landscape_nJNn9.clean.sub3382.vcf.gz"
+The only additional file that is needed to reproduce this is the VCF file titled "Butternut_Landscape_nJNn9.clean.sub3382.vcf.gz", which should be placed in "../JUGCIN_git_externalFiles/" 
 
 To begin, open the R Project located at "./JUGCIN_git.Rproj".
 Under "./scripts/"
@@ -20,3 +23,4 @@ RUN
 3. "./scripts/JUGCIN_prepareData.R" #filter coordinates, combine msats and gbs genetics data, download and extract environmental variables, export for downstream analyses
 4. "./scripts/JUGCIN_spatial2.R" #generate summary tables and figures of hybridization, modeling hybridization with landscape and environmental factors, etc. 
 5. "./scripts/JUGCIN_health.R"
+6. "./scripts/JUGCIN_relatedness.R"

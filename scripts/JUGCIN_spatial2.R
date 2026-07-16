@@ -79,7 +79,8 @@ nh_gens<-read.csv("./summaries/NewHybrids_categories_generations_31.csv")
 order<-nh_gens$Hybrid_Category
 nh_gens$Hybrid_Category <- factor(nh_gens$Hybrid_Category,levels = order)
 pops_health7$NewHyb_FinalAssignmentFACTOR<-factor(pops_health7$NewHyb_FinalAssignment, levels=order)
-newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=FALSE)
+newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=FALSE) %>%
+  mutate(n_perc = 100*n/sum(n))
 #write.csv(newhyb_table,"./summaries/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 #write.csv(newhyb_table,"./summaries/summaries_justGBS/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 p_hist <- pops_health7 %>%
@@ -140,7 +141,8 @@ sum(newhyb_table$n[newhyb_table$Hybrid_Category=='JC'])/sum(newhyb_table$n)
 sum(newhyb_table$n[newhyb_table$Hybrid_Category=='JA'])/sum(newhyb_table$n)
 
 hybrs<-nh_gens[nh_gens$Hybrid_Category!='JA' & nh_gens$Hybrid_Category!='JC',]
-
+hybrs$n_perc<-100*hybrs$n/sum(hybrs$n)
+#write.csv(hybrs,"./summaries/NewHybridsCategoriesSummaryTableHYBRIDSonly.csv", row.names = FALSE)
 p2<-ggplot(hybrs, aes(x = Hybrid_Category, y = n)) +
   geom_col() +
   theme_bw() +
@@ -183,7 +185,9 @@ p5<-ggplot(hybrs, aes(x=AmongHybridMatings,y=n))+
   geom_text_repel(aes(label=Hybrid_Category), max.overlaps=Inf, size=1, segment.colour = 'grey',segment.size = 0.4, min.segment.length = 0)
 p5
 #ggsave(filename="./summaries/summaries_justGBS/amongHybridMatings.png",plot=p5, width=5, height=5, units='in', bg='white' )
-
+hybrs<-hybrs %>% mutate(
+  perc = 100*n/sum(n)
+)
 
 ## summarize categories by "cluster"
 colnames(pops_health7)
