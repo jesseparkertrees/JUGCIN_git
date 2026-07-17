@@ -11,6 +11,7 @@ library(dplyr)
 library(terra)
 library(tidyr)
 library(geodata)
+library(ggeffects)
 ##################################################################
 ## LOAD DATA AND FILTER
 pops_health6<-read.csv("pops_health6.csv")
@@ -21,7 +22,8 @@ pops_health6[pops_health6$NAME_2=='',]
 pops_health6[pops_health6$HASC_2=='',]
 colnames(pops_health6)
 pops_health6$X<-NULL
-
+pops_health6<-pops_health6 %>% mutate(seq_type = ifelse(substr(LabID, 1,5)=='Hoban',1,0))
+colnames(pops_health6)
 ## edit PlantHeight_ft numbers from Hoban microsatellite data that aren't exact numbers
 pops_health6 <- pops_health6 %>%
   mutate(
@@ -461,7 +463,7 @@ plotdata <- hybridsonly %>%
 plottime <- ggplot(plotdata, aes(x = PlantHeight_ft, color = Hybrid_Grouping3_label)) +
   geom_density(linewidth = 1) +
   geom_density(
-    data = hybridsonlygroup,
+    data = hybridsonly,
     aes(x = PlantHeight_ft, color = "All hybrids (157 hybrids with height data)"),
     linewidth = 1,
     linetype = "dashed"
@@ -486,7 +488,7 @@ plotdata2<-plotdata2[plotdata2$Hybrid_Grouping3!='Mating with JA',]
 plottime2 <- ggplot(plotdata2, aes(x = DBH_cm, color = Hybrid_Grouping3_label)) +
   geom_density(linewidth = 1) +
   geom_density(
-    data = hybridsonlygroup,
+    data = hybridsonly,
     aes(x = PlantHeight_ft, color = "All hybrids (157 hybrids with height data)"),
     linewidth = 1,
     linetype = "dashed"
@@ -564,6 +566,7 @@ plottime4
 # SPATIAL MODELING
 #check correlation and select relevant variables
 library(tidyr)
+
 colnames(pops_health7group)
 pops_health7_var<-pops_health7group %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_1,wc2.1_30s_bio_11,wc2.1_30s_bio_12,wc2.1_30s_bio_3) %>% drop_na() %>% as.data.frame()
 cor(pops_health7_var)
@@ -572,13 +575,28 @@ usdm::vif(pops_health7_var)
 pops_health7_var<-pops_health7group %>% select(wildareas.v3.2009.human.footprint, nitrogen_0.5cm, ocd_0.5cm, phh2o_0.5cm, ForestEdge_30m, ForestEdge_NorAmer_custom, TCC, wc2.1_30s_bio_6,wc2.1_30s_bio_12, wc2.1_30s_bio_15) %>% drop_na() %>% as.data.frame()
 usdm::vif(pops_health7_var)
 
+# remove the three sites that only have JA...not relevant
+pops_health7FILT<-pops_health7group %>% filter(!(NewHyb_FinalAssignment=='JA' & CLUSTER_SIZE==1))
+dim(pops_health7FILT)
+dim(pops_health7group)
+
+#remove city level coordinate and recalculate cluster size
+pops_health7FILT<-pops_health7FILT %>% filter(Situation!='City level')
+summary(as.factor(pops_health7FILT$Situation))
+## update cluster size
+pops_health7FILT2 <- pops_health7FILT %>%
+  add_count(CLUSTER_ID, name = "CLUSTER_SIZE_new") %>%
+  mutate(CLUSTER_SIZE_new_log = log10(CLUSTER_SIZE_new))
+dim(pops_health7FILT2)
+
 # is population size skewed?
-hist(pops_health7group$CLUSTER_SIZE) #yes
-hist(log10(pops_health7group$CLUSTER_SIZE))
-summary(pops_health7group$CLUSTER_SIZE)
-hist(scale(log10(pops_health7group$CLUSTER_SIZE)))
-#rescale data
-pops_health7sc <- pops_health7group %>%
+hist(pops_health7FILT2$CLUSTER_SIZE) #yes
+hist(log10(pops_health7FILT2$CLUSTER_SIZE))
+summary(pops_health7FILT2$CLUSTER_SIZE)
+hist(scale(log10(pops_health7FILT2$CLUSTER_SIZE)))
+# rescale data
+colnames(pops_health7FILT2)
+pops_health7sc <- pops_health7FILT2 %>%
   dplyr::mutate(
     PlantHeight_ft = as.numeric(PlantHeight_ft),
     human_footprint_z = scale(wildareas.v3.2009.human.footprint),
@@ -589,6 +607,7 @@ pops_health7sc <- pops_health7group %>%
     bio15_z = scale(wc2.1_30s_bio_15),
     ph_z = scale(phh2o_0.5cm),
     nit_z = scale(nitrogen_0.5cm),
+    seq_type = as.factor(seq_type),
     CLUSTER_SIZE_log_z = scale(CLUSTER_SIZE_log),
     NAME_1=as.factor(NAME_1),
     NAME_2=as.factor(NAME_2),
@@ -617,11 +636,12 @@ pop_ave <- pops_health7sc %>%
     CLUSTER_SIZE_log = first(CLUSTER_SIZE_log),
     .groups = "drop")
 pop_ave
+library(glmmTMB)
 mod_beta<-glmmTMB(avg ~ CLUSTER_SIZE_log,family=beta_family(),data = pop_ave)
 summary(mod_beta)
 pred <- ggpredict(mod_beta, terms = "CLUSTER_SIZE_log")
 # plot transformed data
-ggplot(pred, aes(x = x, y = predicted)) +
+rego<-ggplot(pred, aes(x = x, y = predicted)) +
   geom_line(linewidth = 1) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
   theme_bw() +
@@ -631,23 +651,28 @@ ggplot(pred, aes(x = x, y = predicted)) +
     aes(x = CLUSTER_SIZE_log, y = avg),
     inherit.aes = FALSE,
     alpha = 0.5)
+#ggsave("clusterSizeVSancesComp.png",plot=rego, width=5, height=4, units='in', bg='white')
 ## when including all individuals, with increasing population size comes increased chance of admixture (lower JC ances. propo.) (because there are many small populations (1-5) that are isolated from JA and pure...larger populations are more likely to have SOME admixture), BUT if only looking at populations that contain at least one hybrid:
 hist(pop_ave$avg[pop_ave$CLUSTER_SIZE==1]) #weakly bimodal...amongst singleton pops there are many pure individuals (no opportunity for interspecific mating due to isolation(?), but there are also many relatively highly admixed pops (smaller/ isolated pops more susceptible to introgression due to swamping)
 #only include populations that have at least one hybrid
+
 pop_ave2 <- pops_health7sc %>%
   group_by(CLUSTER_ID) %>%
   filter(any(!NewHyb_FinalAssignment %in% c("JC", "JA"))) %>%
   summarise(
     avg = mean(JC_struc, na.rm = TRUE),
     n = n(),
+    n_HYB = sum(!NewHyb_FinalAssignment %in% c("JC", "JA"), na.rm=TRUE),
     CLUSTER_SIZE = first(CLUSTER_SIZE),
     CLUSTER_SIZE_log = first(CLUSTER_SIZE_log),
     .groups = "drop"
   )
+sum(pop_ave2$n_HYB)
 hist(pop_ave2$avg[pop_ave2$CLUSTER_SIZE==1])
 mod_betaB<-glmmTMB(avg ~ CLUSTER_SIZE_log,family=beta_family(),data = pop_ave2)
 summary(mod_betaB)
 pval <- summary(mod_betaB)$coefficients$cond["CLUSTER_SIZE_log", "Pr(>|z|)"]
+library(performance)
 r2_vals <- r2(mod_betaB)
 label <- sprintf("p = %.3g\nFerrari R² = %.3f",pval,r2_vals$R2)
 pred <- ggpredict(mod_betaB, terms = "CLUSTER_SIZE_log")
@@ -661,7 +686,37 @@ reg1<-ggplot(pred, aes(x = x, y = predicted)) +
 reg1
 ggsave("./summaries/populationSizeVSJCances.png",plot=reg1, width=5, height=4, units='in', bg='white')
 ##so, amongst populations containing hybrids, population size is strongly correlated with average JC ancestry...greater admixture among hybridized genotypes (F2, F3, etc.) may depress average JC ancestry. Larger populations have more JC with which to backcross and elevate the JC proportion over generations... 
+dim(pop_ave2)
+dim(pop_ave)
+dim(pop_ave2[pop_ave2$CLUSTER_SIZE>1,])
 
+pop_aveJA <- pops_health7sc %>%
+  group_by(CLUSTER_ID) %>%
+  filter(any(NewHyb_FinalAssignment=="JA")) %>%
+  summarise(
+    avg = mean(JC_struc, na.rm = TRUE),
+    n = n(),
+    n_JA = sum(NewHyb_FinalAssignment == 'JA', na.rm=TRUE),
+    CLUSTER_SIZE = first(CLUSTER_SIZE),
+    CLUSTER_SIZE_log = first(CLUSTER_SIZE_log),
+    .groups = "drop"
+  )
+
+hyb_no_JA <- setdiff(pop_ave2$CLUSTER_ID, pop_aveJA$CLUSTER_ID)
+
+site_summary <- data.frame(
+  Category = c(
+    "All clusters",
+    "Sites with at least one hybrid",
+    "Sites with JA",
+    "Sites with at least one hybrid but no JA"),
+  N = c(
+    length(pop_ave$CLUSTER_ID),
+    length(pop_ave2$CLUSTER_ID),
+    length(pop_aveJA$CLUSTER_ID),
+    length(hyb_no_JA))) %>% 
+  mutate(Percent = round(100 * N / length(pop_ave$CLUSTER_ID), 1))
+write.csv(site_summary,"./summaries/cluster_summary.csv", row.names = FALSE)
 
 #############################################################
 # SPATIAL MODELING WITH BINARY HYBRID RESPONSE
@@ -677,27 +732,34 @@ library("ggeffects")
 #make forest the reference variable for NLCD land cover (makes this the dummy variable)
 pops_health8$NLCD_5km <- relevel(factor(pops_health8$NLCD_5km),ref = "forest")
 models<-list(
-  mod_beta1 = HybridYN ~ ForestEdge_30m_z*TCC_5km_z*bio6_z*nit_z+(1|CLUSTER_ID),
-  mod_beta2 = HybridYN ~ ForestEdge_NorAmer_custom_z*TCC_5km_z*bio12_z*nit_z+(1|CLUSTER_ID),
-  mod_beta3 = HybridYN ~ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),
-  mod_beta5 = HybridYN ~ bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),
-  mod_beta6 = HybridYN~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),
-  mod_beta7 = HybridYN ~ bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),
-  mod_beta8 = HybridYN ~ bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|NAME_1),
-  mod_beta9 = HybridYN ~  bio15_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),
-  mod_beta10 =HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+ph_z+TCC_5km_z+(1|CLUSTER_ID),
-  mod_beta11 =HybridYN ~  bio6_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),
-  mod_beta12 =HybridYN ~  bio15_z*ForestEdge_NorAmer_custom_z*nit_z*TCC_5km_z+(1|CLUSTER_ID),
-  mod_beta13 =HybridYN ~  ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID),
-  mod_beta14 =HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+TCC_5km_z+NLCD+(1|CLUSTER_ID),
-  mod_beta15 =HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID),
-  mod_beta16 =HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_z+NLCD+(1|CLUSTER_ID)
+  mod_beta1 = HybridYN ~ ForestEdge_30m_z*TCC_5km_z*bio6_z*nit_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta2 = HybridYN ~ ForestEdge_NorAmer_custom_z*TCC_5km_z*bio12_z*nit_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta3 = HybridYN ~ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type,
+  mod_beta5 = HybridYN ~ bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type,
+  mod_beta6 = HybridYN~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type,
+  mod_beta7 = HybridYN ~ bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta8 = HybridYN ~ bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|NAME_1)+seq_type,
+  mod_beta9 = HybridYN ~  bio15_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta10 =HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+nit_z+ph_z+TCC_5km_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta11 =HybridYN ~  bio6_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type,
+  mod_beta12 =HybridYN ~  bio15_z*ForestEdge_NorAmer_custom_z*nit_z*TCC_5km_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta13 =HybridYN ~  ForestEdge_NorAmer_custom_z+nit_z+TCC_5km_z+(1|CLUSTER_ID)+seq_type,
+  mod_beta14 =HybridYN ~  bio15_z+ ForestEdge_NorAmer_custom_z+TCC_5km_z+NLCD+(1|CLUSTER_ID)+seq_type,
+  mod_beta15 =HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type,
+  mod_beta16 =HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_NorAmer_custom_z+nit_z+TCC_z+NLCD+(1|CLUSTER_ID)+seq_type,
+  mod_beta17 =HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_z+NLCD_5km+(1|CLUSTER_ID)+seq_type
 )
 mods <- lapply(models, glmmTMB, family = binomial(), data = pops_health8)
 lapply(mods, summary)
 summary(mods$mod_beta12) #no 'significant' interactions
 lapply(mods,r2, verbose=FALSE)
 lapply(mods,AIC)
+
+modtest1<-glmmTMB(HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID)+seq_type, family = binomial(), data = pops_health8)
+modtest2<-glmmTMB(HybridYN ~  bio12_z+bio6_z+bio15_z+human_footprint_z+ ForestEdge_30m_z+nit_z+TCC_5km_z+NLCD_5km+(1|CLUSTER_ID), family = binomial(), data = pops_health8)
+AIC(modtest1, modtest2)
+
+summary(mods$mod_beta17)
 
 summary(mods$mod_beta15)
 selectedMod<-mods$mod_beta15
@@ -747,7 +809,71 @@ regplot1<-ggplot(preds, aes(x, predicted)) +
   ) +
   labs(x = "Scaled variables",y = "Probability of being a hybrid") + 
   theme_bw()
-#ggsave("./summaries/HybridLandscapeModel.png",plot=regplot1, width=5, height=4, units='in', bg='white')
+regplot1
+
+hist(pops_health8$ForestEdge_30m)
+hist(pops_health8$ForestEdge_30m[pops_health8$HybridYN==1])
+hist(pops_health8$ForestEdge_30m[pops_health8$HybridYN==0])
+
+#plot untransformed predictions
+unscale <- function(z, original) {z * sd(original, na.rm = TRUE) + mean(original, na.rm = TRUE)}
+pred1 <- ggpredict(selectedMod, terms = "TCC_5km_z") %>%
+  mutate(
+    x = unscale(x, pops_health8$TCC_5km),
+    variable = "TCC")
+pred2 <- ggpredict(selectedMod, terms = "bio15_z") %>%
+  mutate(
+    x = unscale(x, pops_health8$bio15),
+    variable = "BIO15")
+pred3 <- ggpredict(selectedMod, terms = "nit_z") %>%
+  mutate(
+    x = unscale(x, pops_health8$nitrogen_0.5cm),
+    variable = "Nitrogen")
+pred4 <- ggpredict(selectedMod, terms = "ForestEdge_30m_z") %>%
+  mutate(
+    x = unscale(x, pops_health8$ForestEdge_30m),
+    variable = "Distance to Forest Edge")
+preds <- bind_rows(pred1, pred2, pred3, pred4)
+preds <- preds |> 
+  dplyr::filter(!is.na(variable))
+pvals<-summary(selectedMod)$coefficients$cond[,'Pr(>|z|)']
+pval_df <- data.frame(
+  variable = c("TCC","BIO15","Nitrogen","Distance to Forest Edge"),
+  label = paste0("p = ",format.pval(pvals[c("TCC_5km_z","bio15_z","nit_z","ForestEdge_30m_z")],digits = 3)))
+pval_df <- pval_df %>% mutate(x = -Inf,y = Inf)
+r2_value <- as.numeric(r2(selectedMod)[2])
+r2_df <- data.frame(
+  variable = unique(preds$variable),
+  label = paste0("Full Model R² = ", round(r2_value, 3)),
+  x = -Inf,
+  y = Inf
+)
+regplot1B<-ggplot(preds, aes(x, predicted)) +
+  geom_line(linewidth = .5) +
+  facet_wrap(~variable, scales = "free_x") +
+  geom_text(
+    data = pval_df,
+    aes(x = x, y = y, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.73,
+    vjust = 1.6,
+    size = 2,
+    fontface = 'italic'
+  ) +
+  geom_text(
+    data = r2_df,
+    aes(x = x, y = y, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.45,
+    vjust = 3.0,
+    size = 2,
+    fontface = "italic"
+  ) +
+  labs(x = "Unscaled variables",y = "Probability of being a hybrid") + 
+  theme_bw()
+regplot1B
+
+ggsave("./summaries/HybridLandscapeModel.png",plot=regplot1B, width=5, height=4, units='in', bg='white')
 pred_NLCD <- ggpredict(selectedMod, terms = "NLCD_5km")
 levels(as.factor(pred_NLCD$x))
 pvals2<-summary(selectedMod)$coefficients$cond[,'Pr(>|z|)']
@@ -790,7 +916,7 @@ regplot2<-ggplot(pred_NLCD, aes(x = x, y = predicted)) +
     y = "Probability of being a hybrid"
   )
 library(patchwork)
-combined_plot <- regplot1 / regplot2
+combined_plot <- regplot1B / regplot2
 ggsave("./summaries/HybridLandscapeModelplots.png",plot=combined_plot, width=4, height=6, units='in', bg='white')
 
 summary(mods$mod_beta15)

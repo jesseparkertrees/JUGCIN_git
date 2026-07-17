@@ -176,6 +176,10 @@ hum_foot<-rast("../JUGCIN_git_externalFiles/landuse/wildareas-v3-2009-human-foot
 files<-list.files("../JUGCIN_git_externalFiles/soil_world", full.names = TRUE)
 soil<-rast(files)
 
+##get topographic data
+#slope<-rast("E:/env_data/data/wc2.1_30s_bio/raw_rasters_touse\var/Slope_LC20_E1.tif")
+
+
 ## crop and combine bioclim, human footprint, and soils data 
 stack<-c(bio_stack, hum_foot)
 stack1_buf<-crop(stack,buffer,mask=TRUE)
