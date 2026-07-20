@@ -2,6 +2,18 @@
 #######  BUTTERNUT SPATIAL ANALYSES  #############################
 ##################################################################
 # LOAD PACKAGES
+install.packages('vegan')
+install.packages('usdm')
+install.packages('ggplot2')
+install.packages('grid')
+install.packages('maps')
+install.packages('dplyr')
+install.packages('terra')
+install.packages('tidyr')
+install.packages('geodata')
+install.packages('ggeffects')
+install.packages('ggrepel')
+
 library(vegan)
 library(usdm)
 library(ggplot2)
@@ -12,6 +24,8 @@ library(terra)
 library(tidyr)
 library(geodata)
 library(ggeffects)
+library(ggrepel)
+
 ##################################################################
 ## LOAD DATA AND FILTER
 pops_health6<-read.csv("pops_health6.csv")
@@ -77,21 +91,19 @@ pops_health7$NewHyb_FinalAssignment<-NULL
 pops_health7<-rename(pops_health7, 'NewHyb_FinalAssignment'='NewHyb_msats')
 
 #2
-#pops_health7<-pops_health6[pops_health6$NewHyb_FinalAssignment!="",]
-#sum(pops_health6$NewHyb_FinalAssignment=="")
-#dim(pops_health6)
-#dim(pops_health7)
+pops_health7<-pops_health6[pops_health6$NewHyb_FinalAssignment!="",]
+sum(pops_health6$NewHyb_FinalAssignment=="")
+dim(pops_health6)
+dim(pops_health7)
 
 ## summarize categories
 nh_gens<-read.csv("./summaries/NewHybrids_categories_generations_31.csv")
 order<-nh_gens$Hybrid_Category
 nh_gens$Hybrid_Category <- factor(nh_gens$Hybrid_Category,levels = order)
 pops_health7$NewHyb_FinalAssignmentFACTOR<-factor(pops_health7$NewHyb_FinalAssignment, levels=order)
-#newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=FALSE) %>%
-  mutate(n_perc = 100*n/sum(n))
-newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=TRUE) %>%
-  mutate(n_perc = 100*n/sum(n))
-write.csv(newhyb_table,"./summaries/summaries_justMSAT/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
+#newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=FALSE) %>% mutate(n_perc = 100*n/sum(n))
+newhyb_table <- pops_health7 %>% count(NewHyb_FinalAssignmentFACTOR, .drop=TRUE) %>% mutate(n_perc = 100*n/sum(n))
+#write.csv(newhyb_table,"./summaries/summaries_justMSAT/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 #write.csv(newhyb_table,"./summaries/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 #write.csv(newhyb_table,"./summaries/summaries_justGBS/NewHybridsCategoriesSummaryTableALL.csv", row.names = FALSE)
 p_hist <- pops_health7 %>%
@@ -180,7 +192,6 @@ p3
 #ggsave(filename="./summaries/summaries_justGBS/HybridSummariesHistogramArrByGens.png",plot=p3, width=5, height=5, units='in', bg='white' )
 #ggsave(filename="./summaries/HybridSummariesHistogramArrByGens.png",plot=p3, width=5, height=5, units='in', bg='white' )
 
-library(ggrepel)
 p4<-ggplot(hybrs, aes(x=Minimum_Number_Hybrid_Generations,y=n))+
   geom_point() +
   theme_bw() +
